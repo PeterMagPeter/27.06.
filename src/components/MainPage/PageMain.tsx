@@ -3,12 +3,14 @@ import { Button, Container, Row, Col } from "react-bootstrap";
 import Header from "../Header/Header";
 import styles from "./PageMain.module.css";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setAiDifficulty, setLobby } from "../reducer/LobbyReducer";
-
+import { generateRoomId } from "../../Resources";
+import socket from "../Websocket/socketInstance";
 export default function PageMain() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  let username = useSelector((state: any) => state.userReducer.username);
   const [leaderboard] = useState([
     { username: "FastFox", userId: 129, country: "Germany", points: 5434 },
     { username: "RedSun", userId: 512, country: "Japan", points: 5146 },
@@ -18,17 +20,29 @@ export default function PageMain() {
     { username: "IronMite", userId: 588, country: "UK", points: 4827 },
     { username: "IceFang", userId: 807, country: "Germany", points: 4801 },
   ]);
+
   const playAgainstAi = () => {
     dispatch(
       setAiDifficulty({
         vsAi: true,
         aiDifficulty: 0.5,
-      }),
-      // random roomId vergeben damit man mehrere ki räume hat
-      setLobby({ roomId: "testIdAgainstAi" })
+      })
     );
+    let roomID = generateRoomId();
+    dispatch(
+      // private ki lobby
+      setLobby({
+        roomId: roomID,
+        gameMode: "1vs1",
+        maxPlayers: 1,
+        privateMatch: true,
+        hostName: username,
+        superWeapons: true,
+      })
+    );
+    socket.emit("sendJoinRoom", roomID, username);
     // oder noch lobby davor?
-    navigate("/shipplacement");
+    navigate("/mineplacement");
   };
   const playOnline = () => {
     // make sure that ai states are false
@@ -43,7 +57,7 @@ export default function PageMain() {
   };
 
   return (
-    <>
+    <div className={styles.container}>
       <Header />
       <div className={styles.mainPage}>
         <Container className={styles.mainContent}>
@@ -94,6 +108,6 @@ export default function PageMain() {
           </Row>
         </Container>
       </div>
-    </>
+    </div>
   );
 }

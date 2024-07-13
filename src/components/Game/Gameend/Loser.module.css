@@ -20,8 +20,21 @@
 
 .loser {
     color: brown;
+    font-size: 4rem;
+    font-weight: 700;
+    margin-bottom: 2vh;
+    margin-top: 2vh;
 }
 
 .subs {
-    color: rgb(141, 141, 141);
+    color: rgb(187, 187, 187);
+    margin-bottom: 2vh;
+}
+
+.backButton {
+    background-color: rgb(187, 187, 187);
+    border: none;
+    border-radius: 5px;
+    height: 40px;
+    width: 100px;
 }

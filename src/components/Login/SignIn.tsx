@@ -1,4 +1,4 @@
-import styles from "./SignIn2.module.css";
+import styles from "./SignIn.module.css";
 import { useReducer, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -9,18 +9,21 @@ import {
   Col,
   Image,
   Card,
+  Alert,
 } from "react-bootstrap";
 import { setUser } from "../reducer/TestReducer";
 import Logo from "../../assets/pictures/cof_logo.png";
 import { postLogin } from "../../backendAPI/loginAPI";
 import { getUser } from "../../backendAPI/userAPI";
-
+import { useNavigate } from "react-router-dom";
+import { generateRoomId } from "../../Resources";
 const server = process.env.REACT_APP_API_SERVER;
 const SignIn = () => {
   const dispatch = useDispatch();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const base64 = btoa(`${email}:${password}`);
+  const navigate = useNavigate();
   let signInCounter = useSelector((state: any) => state.userReducer.signInCounter);
 
   const handleLogin = async (e: any) => {
@@ -35,6 +38,7 @@ const SignIn = () => {
         email: getLoggedIn.email,
         loggedIn: true,
         username: getLoggedIn.username,
+        guest: false
       })
     );
     // }
@@ -45,9 +49,11 @@ const SignIn = () => {
   function handleGuest(): void {
     dispatch(
       setUser({
-        email: "guest",
+        email: email === ""? "guest"+generateRoomId() : email,
         loggedIn: true,
-        username: "guest",
+        username: email === ""? "guest"+generateRoomId() : email,
+        guest: email === "" ? true : false
+
       })
     );
   }
@@ -103,15 +109,16 @@ const SignIn = () => {
           <div className={styles.gastButton}>
             <Button
               onClick={() => handleGuest()}
-              variant="secondary"
+              variant="info"
               className={styles.gastButton}
             >
-              test
+              Als Gast fortfahren
             </Button>
           </div>
-          <div className="text-center mt-3">
-            <a href="/registration">Want to create an account? Sign up</a>
-          </div>
+          <Alert variant="primary" className="text-center mt-3">
+          Want to create an account? Sign up {"\n"}
+          <Alert.Link onClick={() => navigate("/registration")}>Sign in</Alert.Link>
+        </Alert>
         </Form>
       </Container>
     </Container>

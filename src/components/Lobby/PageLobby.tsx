@@ -45,11 +45,15 @@ export default function PageLobby() {
     return () => {};
   }, [socket]);
 
-  function joinGame(roomId: string, privateMatch: boolean): void {
+  function joinGame(roomId: string, privateMatch: boolean, gameMode: string, hostName: string, maxPlayers: number, superWeapons: boolean): void {
     dispatch(
       setLobby({
         roomId: roomId,
         privateMatch: privateMatch,
+        gameMode: gameMode,
+        hostName: hostName,
+        maxPlayers: maxPlayers,
+        superWeapons: superWeapons,
       })
     );
     navigate("/onlineGameSettings");
@@ -106,7 +110,7 @@ export default function PageLobby() {
                 {game.players?.length != game.maxPlayers && (
                   <button
                     className={styles.gameCardFooterButton}
-                    onClick={() => joinGame(game.roomId!, game.privateMatch)}
+                    onClick={() => joinGame(game.roomId!, game.privateMatch, game.gameMode, game.hostName, game.maxPlayers, game.superWeapons)}
                   >
                     Join
                   </button>

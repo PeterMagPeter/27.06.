@@ -14,7 +14,7 @@ import styles from "./PageProfile.module.css";
 export default function PageProfile() {
   // let nick: string = "Peter";
   let lvl: number = 1;
-  let points: number = 0;
+  let points: number = useSelector((state: any) => state.userReducer.points);
   const nick = useSelector((state: any) => state.userReducer.username);
 
   const [edit, setEdit] = useState<boolean>(false);

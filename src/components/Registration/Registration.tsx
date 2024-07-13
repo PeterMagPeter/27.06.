@@ -47,8 +47,8 @@ export default function Registration() {
   };
   return (
     <Container className={styles.container}>
-      <Container className={styles.Logo}>
-        <Image src={Logo} />
+      <Container className={styles.LogoContainer}>
+        <Image src={Logo} className={styles.Logo} />
       </Container>
       <Form className={styles.RegistrationForm}>
         <Form.Group className="mb-3">
