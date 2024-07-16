@@ -52,7 +52,7 @@ export default function Header() {
     dispatch(deleteUser());
     navigate("/");
   }
-
+  let pathname = window.location.pathname;
   return (
     <Navbar className="bg-body-tertiary" data-bs-theme="dark">
       <div className={styles.headerStack}>
@@ -64,6 +64,11 @@ export default function Header() {
             width={"250px"}
           />
         </div>
+
+        <div className={styles.backText} onClick={handleHome}>
+          <a> Go Back</a>
+        </div>
+
         <div className={styles.profileContainer}>
           {!guest && (
             <div className={styles.imageContainer}>
@@ -106,7 +111,10 @@ export default function Header() {
                     Login
                   </NavDropdown.Item>
                 ) : (
-                  <NavDropdown.Item onClick={handleLogout} style={{backgroundColor: "darkred"}}>
+                  <NavDropdown.Item
+                    onClick={handleLogout}
+                    style={{ backgroundColor: "darkred" }}
+                  >
                     Logout
                   </NavDropdown.Item>
                 )}

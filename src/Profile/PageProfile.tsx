@@ -10,12 +10,14 @@ import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { deleteUser } from "../components/reducer/TestReducer";
 import styles from "./PageProfile.module.css";
+import { UserResource } from "../Resources";
 
 export default function PageProfile() {
   // let nick: string = "Peter";
   let lvl: number = 1;
   let points: number = useSelector((state: any) => state.userReducer.points);
   const nick = useSelector((state: any) => state.userReducer.username);
+  const user: UserResource = useSelector((state: any) => state.userReducer.user);
 
   const [edit, setEdit] = useState<boolean>(false);
 
@@ -46,8 +48,8 @@ export default function PageProfile() {
               </Col>
               <Col>
                 <h4 className={styles.profileText}>{nick}</h4>
-                <h4 className={styles.profileText}>Level {lvl}</h4>
-                <h4 className={styles.profileText}>{points} XP</h4>
+                <h4 className={styles.profileText}>Level {user.level}</h4>
+                <h4 className={styles.profileText}>{user.points} XP</h4>
               </Col>
             </Row>
             <hr />

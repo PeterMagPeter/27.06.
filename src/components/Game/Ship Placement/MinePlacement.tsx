@@ -479,7 +479,7 @@ export default function MinePlacement() {
           Debug Mines Button Team 2
         </Button> */}
       </div>
-      <Button onClick={()=>console.log(items, partnerMines)}>print items</Button>
+      {/* <Button onClick={()=>console.log(items, partnerMines)}>print items</Button> */}
       {/* <Button onClick={sendDebugShips}>Debug Ships Button</Button> */}
       {/* einige Teile mit ChatGPT */}
 

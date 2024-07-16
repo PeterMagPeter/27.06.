@@ -10,13 +10,10 @@ export default function PageOnline() {
   const dispatch = useDispatch();
   let username = useSelector((state: any) => state.userReducer.username);
   function hostLobby() {
-    let newRoomid =generateRoomId()
-    console.log(newRoomid)
-    dispatch(
-      setHostName({ hostName: username })
-      
-    );
-    dispatch(setRoomId({ roomId:  newRoomid}))
+    let newRoomid = generateRoomId();
+    console.log(newRoomid);
+    dispatch(setHostName({ hostName: username }));
+    dispatch(setRoomId({ roomId: newRoomid }));
     navigate("/onlineGameSettings");
   }
 
