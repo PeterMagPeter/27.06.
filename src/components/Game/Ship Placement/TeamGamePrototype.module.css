@@ -200,7 +200,7 @@
   /* width: 50%; Größe des runden Buttons */
   height: 100%; /* Größe des runden Buttons */
   top: 50%;
-  left: 1.75vw;
+  left: 1vw;
   transform: translate(-50%, -50%);
   border-radius: 60%;
   background-image: url("../../../assets/pictures/Schiffe/icons/icon2.png");
@@ -214,7 +214,7 @@
   position: absolute;
   width: 100%;
   /* height: 50%; Größe des runden Buttons */
-  top: 3.5vh;
+  top: 2vh;
   left: 50%;
   transform: translate(-50%, -50%);
   border-radius: 60%;
@@ -276,8 +276,9 @@
 }
 .rotatedPic {
   max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  min-height: 100%;
+  /* max-height: 100%; */
+  /* object-fit: contain; */
 }
 .normalPic {
   min-width: 100%;

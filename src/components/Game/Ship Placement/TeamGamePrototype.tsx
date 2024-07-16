@@ -92,10 +92,10 @@ export default function TeamGamePrototype() {
   let largeShip = getSkinImage(skin, "4");
   let xlargeShip = getSkinImage(skin, "5");
   let smallShipR = getSkinImage(skin, "2r");
-  let mediumShipR = getSkinImage(skin, "3r");
+  let mediumShipR = getSkinImage(skin, "3r"); 
   let largeShipR = getSkinImage(skin, "4r");
   let xlargeShipR = getSkinImage(skin, "5r");
-  // console.log("skin: ", skin, smallShip);
+  console.log("skin: ", skin, mediumShip);
 
   // items are ownShips
   // {
@@ -650,8 +650,10 @@ export default function TeamGamePrototype() {
 
     const splitted = item.identifier.match(breakpoint)!;
 
+    let newId = `shipPartner-${splitted[0]}`;
+    if (splitted[1]) newId += "-" + splitted[1];
     let newItem: Layout = {
-      i: `shipPartner-${splitted[0]}-${splitted[1]}`, //i: `ship-${newId}-${letter}`,
+      i: newId, //i: `ship-${newId}-${letter}`,
       // i: "",
       x: item.startX,
       y: item.startY,
@@ -710,6 +712,7 @@ export default function TeamGamePrototype() {
     largeShipR = getSkinImage(newSkin, "4r");
     xlargeShipR = getSkinImage(newSkin, "5r");
     let s: string[] = item.i.split("-");
+    console.log("wahtship ", item, s)
     let newPic = mediumShip;
     if (item.w > item.h) {
       switch (s[1]) {
@@ -869,219 +872,234 @@ export default function TeamGamePrototype() {
   }
   return (
     <>
-    
-    <Container className={styles.container} ref={containerRef}>
-      {/* <Button onClick={() => console.log(items)}> print items</Button> */}
-      {/* <div className={styles.Header}><Header></Header></div> */}
-      <div className={styles.LogoDiv} onClick={(() => goBack())}>
-        <div className={styles.backText}>Go Back</div>
-        {/* <Button onClick={() => sendDebugShips(0)}>
+      <Container className={styles.container} ref={containerRef}>
+        <Button onClick={() => console.log(items, partnerShips)}>
+          {" "}
+          print items
+        </Button>
+        {/* <div className={styles.Header}><Header></Header></div> */}
+        <div className={styles.LogoDiv} onClick={() => goBack()}>
+          <div className={styles.backText}>Go Back</div>
+          {/* <Button onClick={() => sendDebugShips(0)}>
           Debug Ships Button Team 1 oder Solo
         </Button>
         <Button onClick={() => sendDebugShips(1)}>
           Debug Ships Button Team 2
         </Button> */}
-      </div>
+        </div>
 
-      {/* einige Teile mit ChatGPT */}
+        {/* einige Teile mit ChatGPT */}
 
-      <div className={styles.Grid}>
-        {/* <div className={styles.layoutGrind}> */}
-        <ResponsiveGridLayout
-          className={styles.Grid2}
-          layouts={layouts}
-          breakpoints={{ lg: 1000 }}
-          cols={{
-            lg: maxCols,
-            md: maxCols,
-            sm: maxCols,
-            xs: maxCols,
-            xxs: maxCols,
-          }} // 10 columns for each breakpoint
-          rowHeight={rowHeight} // Adjust row height as needed
-          // width={containerRef.current ? containerRef.current.offsetWidth : 1000}
-          isResizable={false}
-          isDroppable={true}
-          useCSSTransforms={true}
-          onDrop={onDrop}
-          allowOverlap={true}
-          preventCollision={true}
-          // onDragStart={handleDragStart}
-          // onDrag={onDragStop}
-          // onDragStop={handleDragStop}
-          onDragStop={onDragStop}
-          onDropDragOver={(e) => {
-            // rote anzeige für größe --- ChatGPT
-            if (draggedItem) {
-              // Versuchen Sie, die Größe basierend auf dem gezogenen Element zu setzen
-              let [nW, nH] = draggedItem.dataset.size
-                ? draggedItem.dataset.size.split("")
-                : [null, null];
-              const w = parseInt(nW || "0");
-              const h = firstH;
-              // Stellen Sie sicher, dass w und h als number zurückgegeben werden
+        <div className={styles.Grid}>
+          {/* <div className={styles.layoutGrind}> */}
+          <ResponsiveGridLayout
+            className={styles.Grid2}
+            layouts={layouts}
+            breakpoints={{ lg: 1000 }}
+            cols={{
+              lg: maxCols,
+              md: maxCols,
+              sm: maxCols,
+              xs: maxCols,
+              xxs: maxCols,
+            }} // 10 columns for each breakpoint
+            rowHeight={rowHeight} // Adjust row height as needed
+            // width={containerRef.current ? containerRef.current.offsetWidth : 1000}
+            isResizable={false}
+            isDroppable={true}
+            useCSSTransforms={true}
+            onDrop={onDrop}
+            allowOverlap={true}
+            preventCollision={true}
+            // onDragStart={handleDragStart}
+            // onDrag={onDragStop}
+            // onDragStop={handleDragStop}
+            onDragStop={onDragStop}
+            onDropDragOver={(e) => {
+              // rote anzeige für größe --- ChatGPT
+              if (draggedItem) {
+                // Versuchen Sie, die Größe basierend auf dem gezogenen Element zu setzen
+                let [nW, nH] = draggedItem.dataset.size
+                  ? draggedItem.dataset.size.split("")
+                  : [null, null];
+                const w = parseInt(nW || "0");
+                const h = firstH;
+                // Stellen Sie sicher, dass w und h als number zurückgegeben werden
+                return {
+                  w: isNaN(w) ? 0 : w, // Verwenden Sie 0 als Standardwert, wenn die Konvertierung fehlschlägt
+                  h: isNaN(h) ? 0 : h, // Verwenden Sie 0 als Standardwert, wenn die Konvertierung fehlschlägt
+                };
+              }
+              // Standardgröße, wenn kein Element gezogen wird
               return {
-                w: isNaN(w) ? 0 : w, // Verwenden Sie 0 als Standardwert, wenn die Konvertierung fehlschlägt
-                h: isNaN(h) ? 0 : h, // Verwenden Sie 0 als Standardwert, wenn die Konvertierung fehlschlägt
+                w: 3, // Neue Breite des Elements
+                h: 1, // Neue Höhe des Elements
               };
-            }
-            // Standardgröße, wenn kein Element gezogen wird
-            return {
-              w: 3, // Neue Breite des Elements
-              h: 1, // Neue Höhe des Elements
-            };
-          }}
-        >
-          {layout.map((item) => (
-            <div
-              key={item.i}
-              className={item.i.startsWith("ship") ? "" : styles.gridCell}
-            >
-              {/* {item.i + " " + item.x + " " + item.y} */}
-            </div>
-          ))}
-          {items.map((item) => {
-            let newPic = whatShip(item, false);
-            return (
+            }}
+          >
+            {layout.map((item) => (
               <div
                 key={item.i}
-                // onDoubleClick={() => rotateRemove(item.i)}
-                className={item.w > item.h ? styles.ship : styles.rotatedShip}
+                className={item.i.startsWith("ship") ? "" : styles.gridCell}
               >
-                <Image
-                  src={newPic}
-                  className={
-                    item.w > item.h ? styles.normalPic : styles.rotatedPic
-                  }
-                />
-                <Button
-                  variant="info"
-                  className={
-                    item.w > item.h
-                      ? styles.rotateButtonW
-                      : styles.rotateButtonH
-                  }
-                  onClick={() => rotateRemove(item.i)}
-                ></Button>
+                {/* {item.i + " " + item.x + " " + item.y} */}
               </div>
-            );
-          })}
-          {partnerShips.map((item) => {
-            let newPic = whatShip(item, true);
-            return (
-              <div key={item.i} className={styles.ship} draggable={false}>
-                <Image
-                  draggable={false}
-                  src={newPic}
-                  className={
-                    item.w > item.h ? styles.normalPic : styles.rotatedPic
-                  }
-                />
-              </div>
-            );
-          })}
-        </ResponsiveGridLayout>
-      </div>
-      {/* </div> */}
+            ))}
+            {items.map((item) => {
+              let newPic = whatShip(item, false);
+              return (
+                <div
+                  key={item.i}
+                  // onDoubleClick={() => rotateRemove(item.i)}
+                  className={item.w > item.h ? styles.ship : styles.rotatedShip}
+                >
+                  <Image
+                    src={newPic}
+                    className={
+                      item.w > item.h ? styles.normalPic : styles.rotatedPic
+                    }
+                  />
+                  <Button
+                    variant="info"
+                    className={
+                      item.w > item.h
+                        ? styles.rotateButtonW
+                        : styles.rotateButtonH
+                    }
+                    onClick={() => rotateRemove(item.i)}
+                  ></Button>
+                </div>
+              );
+            })}
+            {partnerShips.map((item) => {
+              let newPic = whatShip(item, true);
+              return (
+                <div key={item.i} className={styles.ship} draggable={false}>
+                  <Image
+                    draggable={false}
+                    src={newPic}
+                    className={
+                      item.w > item.h ? styles.normalPic : styles.rotatedPic
+                    }
+                  />
+                </div>
+              );
+            })}
+          </ResponsiveGridLayout>
+        </div>
+        {/* </div> */}
 
-      {/* Settings and start button */}
+        {/* Settings and start button */}
 
-      <div className={styles.gameSettings}>
-        <Button
-          className={styles.next}
-          variant={shipSizes.length - 1 >= items.length ? "danger" : "success"}
-          onClick={() => sendShipsFinal()}
-          disabled={shipSizes.length - 1 >= items.length}
-        >
-          Start {playersReady?.length || 0} / {maxPlayers}
-        </Button>
-        {vsAi && difficulty.current > -1 ? (
-          <div className={styles.kiButtons}>
-            <Button
-              className={styles.ki1}
-              onClick={() => swtichKiMode("ki1", kiDifficulties[0])}
-              variant={kiMode == "ki1" ? "primary" : "warning"}
-              disabled={kiMode == "ki1"}
-            >
-              Noob
-            </Button>
-            <Button
-              className={styles.ki2}
-              onClick={() => swtichKiMode("ki2", kiDifficulties[1])}
-              variant={kiMode == "ki2" ? "primary" : "warning"}
-              disabled={kiMode == "ki2"}
-            >
-              Human
-            </Button>
-            <Button
-              className={styles.ki3}
-              onClick={() => swtichKiMode("ki3", kiDifficulties[2])}
-              variant={kiMode == "ki3" ? "primary" : "warning"}
-              disabled={kiMode == "ki3"}
-            >
-              God Mode
-            </Button>
-          </div>
-        ) : null}
-      </div>
+        <div className={styles.gameSettings}>
+          <Button
+            className={styles.next}
+            variant={
+              shipSizes.length - 1 >= items.length ? "danger" : "success"
+            }
+            onClick={() => sendShipsFinal()}
+            disabled={shipSizes.length - 1 >= items.length}
+          >
+            Start {playersReady?.length || 0} / {maxPlayers}
+          </Button>
+          {vsAi && difficulty.current > -1 ? (
+            <div className={styles.kiButtons}>
+              <Button
+                className={styles.ki1}
+                onClick={() => swtichKiMode("ki1", kiDifficulties[0])}
+                variant={kiMode == "ki1" ? "primary" : "warning"}
+                disabled={kiMode == "ki1"}
+              >
+                Noob
+              </Button>
+              <Button
+                className={styles.ki2}
+                onClick={() => swtichKiMode("ki2", kiDifficulties[1])}
+                variant={kiMode == "ki2" ? "primary" : "warning"}
+                disabled={kiMode == "ki2"}
+              >
+                Human
+              </Button>
+              <Button
+                className={styles.ki3}
+                onClick={() => swtichKiMode("ki3", kiDifficulties[2])}
+                variant={kiMode == "ki3" ? "primary" : "warning"}
+                disabled={kiMode == "ki3"}
+              >
+                God Mode
+              </Button>
+            </div>
+          ) : null}
+        </div>
 
-      <div className={styles.Ships}>
-        {/* <Button onClick={placeShipsRandomly} disabled={timerRunning}>
+        <div className={styles.Ships}>
+          {/* <Button onClick={placeShipsRandomly} disabled={timerRunning}>
           Place Ships Randomly
         </Button> */}
-        {/* Schiffs anzeige anhand des Größentags  */}
-        {Object.keys(shipIds.current).map((key) => {
-          let maxVal = maxS;
-          let shipSize = smallShipSize;
-          let newClass: string = styles.s;
-          let newPic = mediumShip;
+          {/* Schiffs anzeige anhand des Größentags  */}
+          {Object.keys(shipIds.current).map((key) => {
+             let newSkin = skin;
+             smallShip = getSkinImage(newSkin, "2");
+             mediumShip = getSkinImage(newSkin, "3");
+             largeShip = getSkinImage(newSkin, "4");
+             xlargeShip = getSkinImage(newSkin, "5");
+             smallShipR = getSkinImage(newSkin, "2r");
+             mediumShipR = getSkinImage(newSkin, "3r");
+             largeShipR = getSkinImage(newSkin, "4r");
+             xlargeShipR = getSkinImage(newSkin, "5r");
+            let maxVal = maxS;
+            let shipSize = smallShipSize;
+            let newClass: string = styles.s;
+            let newPic = mediumShip;
+            console.log("auswahl 1",newPic)
 
-          if (key === "s") {
-            newPic = smallShip;
-          } else if (key === "m") {
-            maxVal = maxM;
-            shipSize = mediumShipSize;
-            newPic = mediumShip;
-            newClass = styles.m;
-          } else if (key === "l") {
-            maxVal = maxL;
-            shipSize = largeShipSize;
-            newPic = largeShip;
-            newClass = styles.l;
-          } else if (key === "xl") {
-            maxVal = maxXL;
-            shipSize = xlShipSize;
-            newPic = xlargeShip;
-            newClass = styles.xl;
-          }
-          // Erstelle ein div-Element für jeden Schlüssel
-          return (
-            <div key={key} className={newClass}>
-              <a>
-                {maxVal - shipIds.current[key] != 0
-                  ? `${maxVal - shipIds.current[key]}  left`
-                  : ""}
-              </a>
-              {maxVal - shipIds.current[key] === 0 ? null : (
-                <div
-                  className={
-                    shipIds.current[key] < maxVal
-                      ? styles.draggableItem
-                      : styles.disabledItem
-                  }
-                  style={{ backgroundImage: `url(${newPic})` }}
-                  draggable={shipIds.current[key] < maxVal ? true : false}
-                  unselectable="on"
-                  onDragStart={(e) => {
-                    e.dataTransfer.setData("text/plain", shipSize);
-                    setDraggedItem(e.currentTarget); // Speichern Sie das aktuell gezogene Element
-                  }}
-                  onTouchStart={(e) => handleTouchStart(e, shipSize)}
-                  onTouchMove={handleTouchMove}
-                  onTouchEnd={handleTouchEnd}
-                  data-size={shipSize}
-                >
-                  {/* <Image
+            if (key === "s") {
+              newPic = smallShip;
+            } else if (key === "m") {
+              maxVal = maxM;
+              shipSize = mediumShipSize;
+              newPic = mediumShip;
+              newClass = styles.m;
+            } else if (key === "l") {
+              maxVal = maxL;
+              shipSize = largeShipSize;
+              newPic = largeShip;
+              newClass = styles.l;
+            } else if (key === "xl") {
+              maxVal = maxXL;
+              shipSize = xlShipSize;
+              newPic = xlargeShip;
+              newClass = styles.xl;
+            }
+            console.log("auswahl ",newPic)
+            // Erstelle ein div-Element für jeden Schlüssel
+            return (
+              <div key={key} className={newClass}>
+                <a>
+                  {maxVal - shipIds.current[key] != 0
+                    ? `${maxVal - shipIds.current[key]}  left`
+                    : ""}
+                </a>
+                {maxVal - shipIds.current[key] === 0 ? null : (
+                  <div
+                    className={
+                      shipIds.current[key] < maxVal
+                        ? styles.draggableItem
+                        : styles.disabledItem
+                    }
+                    style={{ backgroundImage: `url(${newPic})` }}
+                    draggable={shipIds.current[key] < maxVal ? true : false}
+                    unselectable="on"
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("text/plain", shipSize);
+                      setDraggedItem(e.currentTarget); // Speichern Sie das aktuell gezogene Element
+                    }}
+                    onTouchStart={(e) => handleTouchStart(e, shipSize)}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    data-size={shipSize}
+                  >
+                    {/* <Image
                     src={newPic}
                     className={styles.normalPic2}
                     // draggable={shipIds.current[key] < maxVal ? true : false}
@@ -1110,13 +1128,13 @@ export default function TeamGamePrototype() {
                     onContextMenu={(e) => e.preventDefault()}
                     style={{ userSelect: "none", WebkitUserSelect: "none" }}
                   /> */}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-    </Container>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </Container>
     </>
   );
 }

@@ -50,7 +50,9 @@
     ". GameField GameField . EmoteContainer EmoteContainer ."
     ". . . . . . .";
 }
-
+.GameField{
+  justify-items: center;
+}
 .logoContainer{
   grid-area: logoContainer;
   grid-template-areas:
@@ -153,6 +155,7 @@
     "NO19E A19E B19E C19E D19E E19E F19E G19E H19E I19E J19E K19E L19E M19E N19E O19E P19E Q19E R19E S19E T19E"
     "NO20E A20E B20E C20E D20E E20E F20E G20E H20E I20E J20E K20E L20E M20E N20E O20E P20E Q20E R20E S20E T20E";
   align-content: center;
+  justify-items: normal;
   /* scale: 80%; */
   /* aspect-ratio: 1/1; */
 }

@@ -103,14 +103,14 @@ export default function PageLobby() {
             <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
             <Button onClick={joinLobby}> Join</Button>
           </Form.Group>
-          {/* <Button
+          <Button
             variant="danger" 
             size="sm"
             className={styles.onlineButton2}
             onClick={() => deleteAllRooms()}
           >
             DELETE ALL ROOMS
-          </Button> */}
+          </Button>
         </div>
         <Container className={styles.lobbyContent}>
           <h1>Game Lobby</h1>
