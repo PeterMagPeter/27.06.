@@ -873,10 +873,10 @@ export default function TeamGamePrototype() {
   return (
     <>
       <Container className={styles.container} ref={containerRef}>
-        <Button onClick={() => console.log(items, partnerShips)}>
+        {/* <Button onClick={() => console.log(items, partnerShips)}>
           {" "}
           print items
-        </Button>
+        </Button> */}
         {/* <div className={styles.Header}><Header></Header></div> */}
         <div className={styles.LogoDiv} onClick={() => goBack()}>
           <div className={styles.backText}>Go Back</div>
