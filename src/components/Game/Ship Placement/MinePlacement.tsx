@@ -472,12 +472,12 @@ export default function MinePlacement() {
     <Container className={styles.container} ref={containerRef}>
       <div className={styles.LogoDiv}>
         {" "}
-        <Button onClick={() => sendDebugMinesFinal(0)}>
+        {/* <Button onClick={() => sendDebugMinesFinal(0)}>
           Debug Mines Button Team 1 oder Solo
         </Button>
         <Button onClick={() => sendDebugMinesFinal(1)}>
           Debug Mines Button Team 2
-        </Button>
+        </Button> */}
       </div>
       <Button onClick={()=>console.log(items, partnerMines)}>print items</Button>
       {/* <Button onClick={sendDebugShips}>Debug Ships Button</Button> */}

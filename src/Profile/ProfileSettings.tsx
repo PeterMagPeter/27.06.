@@ -247,6 +247,7 @@ export default function EditProfile() {
 
                   saveSkin(e.target.value);
                 }}
+                value={skinKey}
               >
                 <option value="standard">Standard</option>
                 <option value="green">Green</option>
