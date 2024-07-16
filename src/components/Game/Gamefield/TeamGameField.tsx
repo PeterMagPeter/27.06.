@@ -34,6 +34,8 @@ const loser = "/sounds/loser.mp3";
 const myDis = "/sounds/myDis.mp3";
 const victory = "/sounds/victory.mp3";
 const battleMusic = "/sounds/battleMusic.mp3";
+const torpedoSound = "/sounds/torpedoSound.mp3";
+const droneSound = "/sounds/droneSound.mp3";
 
 // sound files end ------
 // TODO
@@ -85,12 +87,16 @@ export default function TeamGameField() {
   let ownMines = useSelector((state: any) => state.lobbyReducer.mines);
 
   // SuperWeapons
+  let superWeapons: string = useSelector(
+    (state: any) => state.lobbyReducer.superWeapons
+  );
+
   const [toggledSuperWeapon, setToggledSuperWeapon] = useState<string>();
   const [usedSuperWeapons, setUsedSuperWeapons] = useState<string[]>([]);
 
   const codeNameTorpedo: string = "torpedo";
   const codeNameDrone: string = "drone";
-
+  const everySuperWeapon: string[] = [codeNameTorpedo, codeNameDrone];
   // match variables
   const rows = gameMode === "Team" ? 14 : 10;
   const cols = gameMode === "Team" ? 14 : 10;
@@ -295,7 +301,6 @@ export default function TeamGameField() {
       } else if (event === "Normal") {
         button.setAttribute("data-state", "");
         button.classList.add(styles.button);
-        console.log("normal gesetzt", button.classList);
       } else if (event === "NormalE") {
         button.setAttribute("data-state", "");
         button.classList.add(styles.buttonE);
@@ -316,7 +321,6 @@ export default function TeamGameField() {
         button.classList.add(styles.Nothing);
       }
     }
-    console.log("changedColor to ", event);
   };
   // Functions that the Player sends
   function sendShot(position: Position) {
@@ -411,9 +415,9 @@ export default function TeamGameField() {
 
   const generateShips = (ships: ShipTemplate[], ownShips: boolean) => {
     const divs = [];
-    let whichSkin = skin;
+    let whichSkin = skin ? skin : "standard";
     console.log("generateShips", whichSkin);
-    if (gameMode === "1vs1") {
+    if (gameMode === "1vs1" && playersSkins.size != 0) {
       for (let [nick, skin] of playersSkins) {
         if (!ownShips) {
           if (nick !== username) {
@@ -433,7 +437,7 @@ export default function TeamGameField() {
       let startRow: number = s.startX + 2;
       let startColumn: number = s.startY + 2;
       let endColumn, endRow;
-      if (gameMode === "Team") {
+      if (gameMode === "Team" && playersSkins.size != 0) {
         let id = s.identifier.split(":")[1];
         whichSkin = playersSkins.get(id);
         console.log("generateShips ", id, whichSkin);
@@ -595,8 +599,27 @@ export default function TeamGameField() {
   };
 
   function changeOpacity(imgId: string) {
-    let image = document.getElementById(imgId) as HTMLImageElement;
-    image.style.opacity = "0.7";
+    let image = document.getElementById(imgId) as HTMLImageElement | null;
+    if (!image) {
+      console.error(`Element with id ${imgId} not found`);
+      return;
+    }
+
+    let withoutCurrent = everySuperWeapon.filter((item) => item !== imgId);
+    withoutCurrent?.forEach((item) => {
+      let image2 = document.getElementById(item) as HTMLImageElement | null;
+      if (image2) {
+        image2.style.opacity = "1";
+      } else {
+        console.error(`Element with id ${item} not found`);
+      }
+    });
+
+    if (toggledSuperWeapon === imgId) {
+      image.style.opacity = "1";
+    } else {
+      image.style.opacity = "0.7";
+    }
   }
 
   function torpedo(): void {
@@ -607,13 +630,16 @@ export default function TeamGameField() {
   function sendTorpedo(startPosition: Position, horizontal: boolean): void {
     setUsedSuperWeapons([...usedSuperWeapons, codeNameTorpedo]);
     setToggledSuperWeapon("");
-    socket.emit(
-      "sendDetonateTorpedo",
-      roomId,
-      username,
-      startPosition,
-      horizontal
-    );
+    playSFXSound(torpedoSound);
+    setTimeout(() => {
+      socket.emit(
+        "sendDetonateTorpedo",
+        roomId,
+        username,
+        startPosition,
+        horizontal
+      );
+    },400);
   }
 
   function drone(): void {
@@ -624,6 +650,7 @@ export default function TeamGameField() {
   function sendDrone(startPosition: Position) {
     setUsedSuperWeapons([...usedSuperWeapons, codeNameDrone]);
     setToggledSuperWeapon("");
+    playSFXSound(droneSound);
     socket.emit("sendDetonateDrone", roomId, username, startPosition);
   }
 
@@ -655,8 +682,8 @@ export default function TeamGameField() {
               : styles.Ownboard
           }
           style={{
-            gridTemplateColumns: `repeat(${cols+1}, 1fr)`,
-            gridTemplateRows: `repeat(${rows+1}, 1fr)`,
+            gridTemplateColumns: `repeat(${cols + 1}, 1fr)`,
+            gridTemplateRows: `repeat(${rows + 1}, 1fr)`,
           }}
         >
           {generateShips(enemyShips, false)}
@@ -788,8 +815,8 @@ export default function TeamGameField() {
               : styles.Ownboard
           }
           style={{
-            gridTemplateColumns: `repeat(${cols+1}, 1fr)`,
-            gridTemplateRows: `repeat(${rows+1}, 1fr)`,
+            gridTemplateColumns: `repeat(${cols + 1}, 1fr)`,
+            gridTemplateRows: `repeat(${rows + 1}, 1fr)`,
           }}
         >
           {generateShips(ownShips, true)}
@@ -851,25 +878,26 @@ export default function TeamGameField() {
             });
           })}
         </div>
-
-        <div className={styles.SuperWeaponsContainer}>
-          <div className={styles.SuperWeapons}>
-            {!usedSuperWeapons.some((name) => name === codeNameTorpedo) && (
-              <img
-                id="torpedoButton"
-                src={torpedoImg}
-                onClick={() => (torpedo(), changeOpacity("torpedoButton"))}
-              ></img>
-            )}
-            {!usedSuperWeapons.some((name) => name === codeNameDrone) && (
-              <img
-                id="droneButton"
-                src={droneImg}
-                onClick={() => (drone(), changeOpacity("droneButton"))}
-              ></img>
-            )}
+        {superWeapons && whichTurn && (
+          <div className={styles.SuperWeaponsContainer}>
+            <div className={styles.SuperWeapons}>
+              {!usedSuperWeapons.some((name) => name === codeNameTorpedo) && (
+                <img
+                  id={codeNameTorpedo}
+                  src={torpedoImg}
+                  onClick={() => (torpedo(), changeOpacity(codeNameTorpedo))}
+                ></img>
+              )}
+              {!usedSuperWeapons.some((name) => name === codeNameDrone) && (
+                <img
+                  id={codeNameDrone}
+                  src={droneImg}
+                  onClick={() => (drone(), changeOpacity(codeNameDrone))}
+                ></img>
+              )}
+            </div>
           </div>
-        </div>
+        )}
         <div className={styles.EmoteContainer}>
           <div className={styles.Emotes}>
             <Button className={styles.EmoteButton} variant="secondary">

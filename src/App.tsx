@@ -22,6 +22,7 @@ import TeamGamePrototype from "./components/Game/Ship Placement/TeamGamePrototyp
 import TeamGameField from "./components/Game/Gamefield/TeamGameField";
 import socket from "./components/Websocket/socketInstance";
 import MinePlacement from "./components/Game/Ship Placement/MinePlacement";
+import WaitForVerification from "./components/Login/WaitForVerfication";
 function App() {
   const loggedIn = useSelector((state: any) => state.userReducer.loggedIn);
   const username = useSelector((state: any) => state.userReducer.username);
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/loose" element={<Loser />} />
                 <Route path="/test" element={<MinePlacement />} />
                 <Route path="*" element={<Navigate to="/" />} />
+                <Route path="/verification" element={<WaitForVerification/>} />
               </>
             ) : (
               <>
@@ -65,6 +67,8 @@ function App() {
                 <Route path="/registration" element={<Registration />} />
                 <Route path="*" element={<Navigate to="/" />} />
                 <Route path="/test" element={<MinePlacement />} />
+                <Route path="/verification" element={<WaitForVerification/>} />
+
 
               </>
             )}

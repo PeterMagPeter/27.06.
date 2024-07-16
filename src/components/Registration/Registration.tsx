@@ -39,7 +39,7 @@ export default function Registration() {
       username: username,
     });
 
-    navigate("/")
+    navigate("/verification")
     
     console.log(newUser)
     // wenn passwort und email übereinstimmen soll der user angelegt werden

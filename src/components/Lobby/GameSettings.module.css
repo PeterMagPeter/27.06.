@@ -9,7 +9,7 @@
   justify-content: center;
   color: white;
   text-align: center;
-  overflow: scroll;
+  overflow: hidden;
 }
 
 .gameSettings {

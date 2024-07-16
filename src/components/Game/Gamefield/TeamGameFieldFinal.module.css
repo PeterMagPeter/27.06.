@@ -12,18 +12,33 @@
   overflow-x: visible;
 }
 .container1vs1 {
-  grid-template-columns: 0.2fr 1.2fr 1.2fr 0.2fr 1fr 0.2fr 0.8fr 0.8fr 0.2fr;
-  grid-template-rows: 0.2fr 0.5fr 1fr 1fr 1fr 0.3fr 1fr 0.2fr;
+  grid-template-columns: 0.2fr 2fr 0.5fr 0.2fr 1fr 0.2fr 0.8fr 0.8fr 0.2fr;
+  grid-template-rows: 0.2fr 0.5fr 1fr 1fr 1fr 0.3fr 0.5fr 0.2fr;
   grid-template-areas:
     ". . . . . . . . ."
     ". . . . whosTurn . logoContainer logoContainer logoContainer"
-    ". GameField GameField . . . Ownboard Ownboard ."
-    ". GameField GameField . . . Ownboard Ownboard ."
-    ". GameField GameField . . . Ownboard Ownboard ."
+    ". GameField . . . . Ownboard . ."
+    ". GameField . . . . Ownboard . ."
+    ". GameField . . . . Ownboard . ."
     ". . . . . . . . ."
-    ". SuperWeaponsContainer SuperWeaponsContainer EmoteContainer EmoteContainer EmoteContainer . . . "
+    ". SuperWeaponsContainer SuperWeaponsContainer EmoteContainer EmoteContainer . . . . "
     ". . . . . . . . .";
 }
+
+/* .container1vs1 {
+  grid-template-columns: 0.2fr 2fr 1fr 0.2fr 1fr 0.2fr 0.8fr 0.8fr 0.2fr;
+  grid-template-rows: 0.2fr 0.5fr 1fr 1fr 1fr 0.3fr 0.5fr 0.2fr;
+  grid-template-areas:
+    ". . . . . . . . ."
+    ". . . . whosTurn . logoContainer logoContainer logoContainer"
+    ". GameField . . . . . . ."
+    ". GameField . . . . Ownboard . ."
+    ". GameField . . . . Ownboard . ."
+    ". . . . . . . . ."
+    ". SuperWeaponsContainer SuperWeaponsContainer EmoteContainer EmoteContainer . . . . "
+    ". . . . . . . . .";
+} */
+
 .containerTeam {
   grid-template-columns: 0.3fr 1fr 1fr 0.5fr 0.5fr 1fr 0.3fr;
   grid-template-rows: 0.5fr 1fr 1fr 1fr 1fr 0.5fr;
@@ -42,6 +57,8 @@
     "Logo"
 }
 .SuperWeaponsContainer{
+  /* height: 120px; */
+  margin-top:20px;
   grid-area: SuperWeaponsContainer;
   grid-template-areas:
     "SuperWeapons"
@@ -77,7 +94,7 @@
 }
 .SuperWeapons {
   grid-area: SuperWeapons;
-  min-height: 100%;
+  max-height: 100%;
   justify-content: center;
   align-content: center;
   justify-items: center;
@@ -136,7 +153,7 @@
     "NO19E A19E B19E C19E D19E E19E F19E G19E H19E I19E J19E K19E L19E M19E N19E O19E P19E Q19E R19E S19E T19E"
     "NO20E A20E B20E C20E D20E E20E F20E G20E H20E I20E J20E K20E L20E M20E N20E O20E P20E Q20E R20E S20E T20E";
   align-content: center;
-  scale: 80%;
+  /* scale: 80%; */
   /* aspect-ratio: 1/1; */
 }
 .newElement {
@@ -167,7 +184,9 @@
 
 .miniContainerPfeil:hover,
 .miniContainerPfeilTurned:hover {
-  max-width: 80%;
+  /* max-width: 95%;
+  justify-items: auto; */
+  background-color: rgba(0, 255, 55, 0.537);
 }
 
 /* vertical */
@@ -286,6 +305,7 @@
     "NO20 A20 B20 C20 D20 E20 F20 G20 H20 I20 J20 K20 L20 M20 N20 O20 P20 Q20 R20 S20 T20";
   justify-content: center;
   align-content: center;
+  justify-items: center
 }
 /* Alle spielfelder normalisieren */
 .Hit,

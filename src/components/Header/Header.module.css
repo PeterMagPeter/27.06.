@@ -1,9 +1,12 @@
 .headerStack {
   display: flex;
   width: 100%;
+  max-width: 100%;
   align-items: center;
   flex-direction: row;
   justify-content: space-between;
+  /* overflow: hidden; */
+  
 }
 
 .profileContainer {
@@ -40,6 +43,11 @@
 
 .headerDropdown {
   margin-right: 0.5vw;
+}
+.navbar {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
 }
 @media screen and (max-width: 900px) {
   .headerStack {

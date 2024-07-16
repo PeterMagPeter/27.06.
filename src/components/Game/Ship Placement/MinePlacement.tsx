@@ -132,7 +132,7 @@ export default function MinePlacement() {
     if (currentMines.current < maxMines) {
       currentMines.current += 1;
       count = currentMines.current;
-    } else noSkip = false; 
+    } else noSkip = false;
 
     if (item.y >= maxCols) item.y = maxCols - 1;
     // Konvertieren Sie den ASCII-Wert in einen Buchstaben
@@ -248,23 +248,14 @@ export default function MinePlacement() {
     let newItems: Layout[] = [];
     newItems = arr.map((item, index) => {
       let s: string[] = item.i.split("-");
-      let newID: string = "minePartner";
-      switch (s[1]) {
-        case "2":
-          newID += s[2];
-          break;
-        case "3":
-          newID += s[2];
-          break;
-        default:
-          break;
-      }
+      console.log(s)
+      let newID: string = "minePartner-"+s[1];
 
       return {
         i: newID,
         x: item.x,
         y: item.y,
-        w: item.w ,
+        w: item.w,
         h: item.h,
         id: item.id,
       };
@@ -344,7 +335,11 @@ export default function MinePlacement() {
     // erstellt das richtige Format für weiterleitung an die anderen
     // i: `ship-${newId}-${letter}`,
 
-    let newItems: Position[] = [{x: 2+i, y: 2+i}, {x: 3+i, y: 3+i}, {x: 5+i, y: 5+i}];
+    let newItems: Position[] = [
+      { x: 2 + i, y: 2 + i },
+      { x: 3 + i, y: 3 + i },
+      { x: 5 + i, y: 5 + i },
+    ];
     // ---------
     console.log(newItems);
 
@@ -364,7 +359,7 @@ export default function MinePlacement() {
       (item, index, self) => index === self.findIndex((t) => t.i === item.i)
     );
 
-    if (uniqueLayout.length !== layout.length) {
+    if (uniqueLayout.length !== layout.length) { 
       setLayout(uniqueLayout);
     }
   }, [layout]);
@@ -475,9 +470,16 @@ export default function MinePlacement() {
 
   return (
     <Container className={styles.container} ref={containerRef}>
-       <Button onClick={()=>sendDebugMinesFinal(0)}>Debug Mines Button Team 1 oder Solo</Button>
-      <Button onClick={()=>sendDebugMinesFinal(1)}>Debug Mines Button  Team 2</Button>
-      <div className={styles.LogoDiv}></div>
+      <div className={styles.LogoDiv}>
+        {" "}
+        <Button onClick={() => sendDebugMinesFinal(0)}>
+          Debug Mines Button Team 1 oder Solo
+        </Button>
+        <Button onClick={() => sendDebugMinesFinal(1)}>
+          Debug Mines Button Team 2
+        </Button>
+      </div>
+      <Button onClick={()=>console.log(items, partnerMines)}>print items</Button>
       {/* <Button onClick={sendDebugShips}>Debug Ships Button</Button> */}
       {/* einige Teile mit ChatGPT */}
 

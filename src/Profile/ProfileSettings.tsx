@@ -15,27 +15,21 @@ import { Modal, Toast, ToastBody, ToastHeader } from "react-bootstrap";
  */
 export default function EditProfile() {
   const dispatch = useDispatch();
-  const nick = useSelector((state: any) => state.userReducer.username);
-  const email = useSelector((state: any) => state.userReducer.email);
-  let skin = useSelector((state: any) => state.userReducer.skin);
+  const user = useSelector((state: any) => state.userReducer.user);
+  const skin = useSelector((state: any) => state.userReducer.skin);
   const [modalText, setModalText] = useState<string>();
   const [modalTitle, setModalTitle] = useState<string>();
   const [modalBg, setModalBg] = useState<string>();
 
   const [showModal, setShowModal] = useState(false);
 
-  let user: UserResource = {
-    email: email,
-    username: nick,
-    password: "secure1",
-  };
   const [userData, setUserData] = useState({
     email: user.email,
     password: user.password,
   });
 
   const [skinSetting, setSkinSetting] = useState<boolean>(false);
-  const [skinKey, setSkinKey] = useState("standard");
+  const [skinKey, setSkinKey] = useState(skin);
 
   const [edit, setEdit] = useState<string>("");
 
@@ -43,16 +37,17 @@ export default function EditProfile() {
     setUserData({ ...userData, [e.target.name]: e.target.value });
   }
   useEffect(() => {
-    socket.emit("sendGiveMeMySkin", nick);
+    socket.emit("sendGiveMeMySkin", user.username);
 
     return () => {};
   }, []);
 
   async function updateUser() {
     await putUser({
-      email: userData.email,
-      password: userData.password,
-      username: nick,
+      _id: user._id,
+      email: user.email,
+      password: user.password,
+      username: user.username,
     });
 
     dispatch(
@@ -187,7 +182,7 @@ export default function EditProfile() {
                   onClick={() => setEdit("email")}
                   className={styles.settingsButton}
                 >
-                  Change e-mail adress
+                  Change e-mail address
                 </button>
               )}
               <hr />
@@ -248,7 +243,7 @@ export default function EditProfile() {
                 className={styles.skinSelect}
                 onChange={(e) => {
                   setSkinKey(e.target.value);
-                  socket.emit("sendChangeSkin", nick, e.target.value);
+                  socket.emit("sendChangeSkin", user.username, e.target.value);
 
                   saveSkin(e.target.value);
                 }}

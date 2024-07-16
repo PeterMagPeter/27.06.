@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { UserResource } from "../../Resources";
 export interface ShipTemplate {
   identifier: string;
   direction: "X" | "Y";
@@ -19,6 +20,7 @@ export interface Ship {
 }
 interface User {
   token: string;
+  user: UserResource | null
   loggedIn: boolean;
   username: string;
   email: string;
@@ -31,6 +33,7 @@ interface User {
 // Initialer Zustand des Reducers
 const initialState: User = {
   token: "",
+  user: null,
   loggedIn: false,
   username: "",
   email: "",
@@ -50,6 +53,7 @@ const userReducer = createSlice({
       state.username = "";
       state.loggedIn = false;
       state.email = "";
+      state.user = null
       console.log("user gelöscht: ");
     },
     setUser: (state, action) => {
@@ -58,6 +62,9 @@ const userReducer = createSlice({
       state.username = action.payload.username;
       state.email = action.payload.email;
       state.guest = action.payload.guest;
+    },
+    setUserObject: (state, action)=>{
+      state.user = action.payload.user
     },
     setShips: (state, action) => {
       state.ships = action.payload.ships;
@@ -72,5 +79,5 @@ const userReducer = createSlice({
 });
 
 // Exportiere Reducer und Aktionen
-export const { deleteUser, setUser, setShips, setSkin } = userReducer.actions;
+export const { deleteUser, setUser, setShips, setSkin,setUserObject } = userReducer.actions;
 export default userReducer.reducer;

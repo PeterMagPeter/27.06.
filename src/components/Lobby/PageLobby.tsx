@@ -1,16 +1,4 @@
-import {
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  CardText,
-  CardTitle,
-  Container,
-  Button,
-  Row,
-  Col,
-  Form,
-} from "react-bootstrap";
+import { Container, Button, Form } from "react-bootstrap";
 import Header from "../Header/Header";
 import styles from "./PageLobby.module.css";
 import { useNavigate } from "react-router-dom";
@@ -18,16 +6,26 @@ import socket from "../Websocket/socketInstance";
 import { hostSettings, setLobby } from "../reducer/LobbyReducer";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+
 export default function PageLobby() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   let username = useSelector((state: any) => state.userReducer.username);
   const [games, setGames] = useState<hostSettings[]>();
-  const [gameMode, setGameMode] = useState<string>("1vs1");
+  const [gameMode, setGameMode] = useState<string>("");
+  const [roomInput, setRoomInput] = useState<string>("");
   //placeholders------------------ change to hostSettings interface in future
 
   function deleteAllRooms(): void {
     socket.emit("sendCloseAllRooms");
+  }
+  function joinLobby(): void {
+    dispatch(
+      setLobby({
+        roomId: roomInput,
+      })
+    );
+    navigate("/onlineGameSettings");
   }
   useEffect(() => {
     socket.emit("sendGetLobbies", gameMode);
@@ -45,7 +43,14 @@ export default function PageLobby() {
     return () => {};
   }, [socket]);
 
-  function joinGame(roomId: string, privateMatch: boolean, gameMode: string, hostName: string, maxPlayers: number, superWeapons: boolean): void {
+  function joinGame(
+    roomId: string,
+    privateMatch: boolean,
+    gameMode: string,
+    hostName: string,
+    maxPlayers: number,
+    superWeapons: boolean
+  ): void {
     dispatch(
       setLobby({
         roomId: roomId,
@@ -66,25 +71,40 @@ export default function PageLobby() {
 
   return (
     <>
-      <Header />
+      <Header  />
 
       <div className={styles.lobbyPage}>
         <div className={styles.searchContainer}>
-         
           <Form.Select
             onChange={(event) => {
               let newMode = event.target.value;
+              if (newMode === "All") newMode = "";
               setGameMode(newMode);
             }}
           >
+            <option>All</option>
             <option>1vs1</option>
             {/* <option>FFA</option> */}
             <option>Team</option>
             {/* <option>3</option> */}
           </Form.Select>
-          <Button size="lg" onClick={getLobbies}> get Lobbies</Button>
+          <Button size="lg" onClick={getLobbies}>
+            {" "}
+            get Lobbies
+          </Button>
+          <Form.Group controlId="validationCustom01">
+            <Form.Label>RoomID</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="..."
+              value={roomInput}
+              onChange={(e) => setRoomInput(e.target.value)}
+            />
+            <Form.Control.Feedback>Looks good!</Form.Control.Feedback>
+            <Button onClick={joinLobby}> Join</Button>
+          </Form.Group>
           <Button
-            variant="danger"
+            variant="danger" 
             size="sm"
             className={styles.onlineButton2}
             onClick={() => deleteAllRooms()}
@@ -110,7 +130,16 @@ export default function PageLobby() {
                 {game.players?.length != game.maxPlayers && (
                   <button
                     className={styles.gameCardFooterButton}
-                    onClick={() => joinGame(game.roomId!, game.privateMatch, game.gameMode, game.hostName, game.maxPlayers, game.superWeapons)}
+                    onClick={() =>
+                      joinGame(
+                        game.roomId!,
+                        game.privateMatch,
+                        game.gameMode,
+                        game.hostName,
+                        game.maxPlayers,
+                        game.superWeapons
+                      )
+                    }
                   >
                     Join
                   </button>

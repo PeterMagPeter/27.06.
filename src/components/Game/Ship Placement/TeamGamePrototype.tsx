@@ -8,8 +8,14 @@ import useWebSocket from "../../Websocket/useWebSocket";
 import socket from "../../Websocket/socketInstance";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
-import { Ship, ShipTemplate, setShips } from "../../reducer/TestReducer";
 import {
+  Ship,
+  ShipTemplate,
+  setShips,
+  setSkin,
+} from "../../reducer/TestReducer";
+import {
+  deleteLobby,
   setAiDifficulty,
   setInitPlayer,
   setLobby,
@@ -26,6 +32,7 @@ import {
 import logoPic from "../../../assets/pictures/cof_logo.png";
 import { match } from "assert";
 import { getSkinImage } from "../../../Resources";
+import Header from "../../Header/Header";
 const ResponsiveGridLayout = WidthProvider(Responsive);
 // instant place button -> search for "Debug Ships Button" and make it to real code
 const space = 0;
@@ -88,9 +95,18 @@ export default function TeamGamePrototype() {
   let mediumShipR = getSkinImage(skin, "3r");
   let largeShipR = getSkinImage(skin, "4r");
   let xlargeShipR = getSkinImage(skin, "5r");
-  console.log("skin: ", skin, smallShip);
+  // console.log("skin: ", skin, smallShip);
 
   // items are ownShips
+  // {
+  //   i: "ship-2-test",
+  //   x: 1, //startX
+  //   y: 2, //startY
+  //   w: 2,
+  //   h: 1,
+  //   static: true,
+  //   id: "",
+  // }
   const [items, setItems] = useState<Array<Layout>>([]);
   const [delItems, setDelItems] = useState<Array<Layout>>([]);
 
@@ -149,15 +165,17 @@ export default function TeamGamePrototype() {
       "gameStart",
       (
         initPlayer: string,
-        skinMap: any,
+        skinMap?: any,
         team1Ships?: Ship[],
         team2Ships?: Ship[]
       ) => {
         let team1: boolean = false;
         let myShips: ShipTemplate[] = items.map(layoutToShipTemplate);
-        dispatch(
-          setPlayersSkins({ playersSkins: new Map(Object.entries(skinMap)) })
-        );
+        if (skinMap) {
+          let newMap = new Map(Object.entries(skinMap));
+          // newMap.set(username, skin)
+          dispatch(setPlayersSkins({ playersSkins: newMap }));
+        }
         if (team1Ships && team2Ships) {
           team1 = team1Ships.some((ship) => {
             const s = ship.identifier.split(":")[1];
@@ -762,18 +780,113 @@ export default function TeamGamePrototype() {
     setDraggedItem(e.currentTarget);
   };
 
+  const [touchedShip, setTouchedShip] = useState<string | null>(null);
+  const [touchStartPos, setTouchStartPos] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+
+  const handleTouchStart = (e: React.TouchEvent, shipSize: string) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const startTime = Date.now();
+    const startPos = { x: touch.clientX, y: touch.clientY };
+
+    const timer = setTimeout(() => {
+      const distanceMoved = Math.sqrt(
+        Math.pow(touch.clientX - startPos.x, 2) +
+          Math.pow(touch.clientY - startPos.y, 2)
+      );
+      if (distanceMoved < 10) {
+        // Wenn sich der Finger kaum bewegt hat
+        setTouchedShip(shipSize);
+        setTouchStartPos(startPos);
+      }
+    }, 200); // 200ms Verzögerung
+
+    const handleTouchEnd = () => {
+      clearTimeout(timer);
+      document.removeEventListener("touchend", handleTouchEnd);
+    };
+
+    document.addEventListener("touchend", handleTouchEnd, { once: true });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!touchedShip) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    // Hier können Sie visuelle Feedback für das Ziehen hinzufügen
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!touchedShip || !touchStartPos) return;
+    e.preventDefault();
+    const touch = e.changedTouches[0];
+    const dropTarget = document.elementFromPoint(touch.clientX, touch.clientY);
+    if (dropTarget && dropTarget.classList.contains("gridCell")) {
+      const rect = dropTarget.getBoundingClientRect();
+      const x = Math.floor(
+        (touch.clientX - rect.left) / (rect.width / maxCols)
+      );
+      const y = Math.floor(
+        (touch.clientY - rect.top) / (rect.height / maxRows)
+      );
+      handleShipDrop(touchedShip, x, y);
+    }
+    setTouchedShip(null);
+    setTouchStartPos(null);
+  };
+  const handleShipDrop = (shipSize: string, x: number, y: number) => {
+    const newW = parseInt(shipSize);
+    const newH = firstH;
+    const newId = shipSize;
+
+    // Hier Ihre Logik zum Hinzufügen des Schiffs, ähnlich wie in Ihrer bestehenden onDrop-Funktion
+    let newItem: any = {
+      i: `ship-${newId}-${String.fromCharCode(
+        97 + shipIds.current[shipSize[0]]
+      )}`,
+      x: x,
+      y: y,
+      w: newW,
+      h: newH,
+      id: newId,
+    };
+
+    newItem = findNonOverlappingPosition(newItem);
+
+    setItems([...items, newItem]);
+    if (gameMode === "Team") sendShipsToPartner([...items, newItem]);
+
+    // Aktualisieren Sie shipIds
+    shipIds.current[shipSize[0]] += 1;
+  };
+  function goBack(): void {
+    socket.emit("sendLeaveRoom", roomId);
+    dispatch(deleteLobby());
+    navigate("/");
+  }
   return (
+    <>
+    
     <Container className={styles.container} ref={containerRef}>
-      <div className={styles.LogoDiv}></div>
-      <Button onClick={() => sendDebugShips(0)}>
-        Debug Ships Button Team 1 oder Solo
-      </Button>
-      <Button onClick={() => sendDebugShips(1)}>
-        Debug Ships Button Team 2
-      </Button>
+      {/* <Button onClick={() => console.log(items)}> print items</Button> */}
+      {/* <div className={styles.Header}><Header></Header></div> */}
+      <div className={styles.LogoDiv} onClick={(() => goBack())}>
+        <div className={styles.backText}>Go Back</div>
+        {/* <Button onClick={() => sendDebugShips(0)}>
+          Debug Ships Button Team 1 oder Solo
+        </Button>
+        <Button onClick={() => sendDebugShips(1)}>
+          Debug Ships Button Team 2
+        </Button> */}
+      </div>
+
       {/* einige Teile mit ChatGPT */}
 
       <div className={styles.Grid}>
+        {/* <div className={styles.layoutGrind}> */}
         <ResponsiveGridLayout
           className={styles.Grid2}
           layouts={layouts}
@@ -789,6 +902,7 @@ export default function TeamGamePrototype() {
           // width={containerRef.current ? containerRef.current.offsetWidth : 1000}
           isResizable={false}
           isDroppable={true}
+          useCSSTransforms={true}
           onDrop={onDrop}
           allowOverlap={true}
           preventCollision={true}
@@ -868,6 +982,8 @@ export default function TeamGamePrototype() {
           })}
         </ResponsiveGridLayout>
       </div>
+      {/* </div> */}
+
       {/* Settings and start button */}
 
       <div className={styles.gameSettings}>
@@ -953,19 +1069,47 @@ export default function TeamGamePrototype() {
                       ? styles.draggableItem
                       : styles.disabledItem
                   }
+                  style={{ backgroundImage: `url(${newPic})` }}
                   draggable={shipIds.current[key] < maxVal ? true : false}
                   unselectable="on"
                   onDragStart={(e) => {
                     e.dataTransfer.setData("text/plain", shipSize);
                     setDraggedItem(e.currentTarget); // Speichern Sie das aktuell gezogene Element
                   }}
+                  onTouchStart={(e) => handleTouchStart(e, shipSize)}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
                   data-size={shipSize}
                 >
-                  <Image
+                  {/* <Image
                     src={newPic}
                     className={styles.normalPic2}
-                    draggable={shipIds.current[key] < maxVal ? true : false}
-                  />
+                    // draggable={shipIds.current[key] < maxVal ? true : false}
+                    draggable={false}
+                    onTouchStart={(e) => {
+                      e.stopPropagation(); // Verhindert Bubbling
+                      handleTouchStart(e, shipSize);
+                    }}
+                    onTouchMove={(e) => {
+                      e.stopPropagation();
+                      handleTouchMove(e);
+                    }}
+                    onTouchEnd={(e) => {
+                      e.stopPropagation();
+                      handleTouchEnd(e);
+                    }}
+                    onDragStart={(e) => {
+                      e.preventDefault(); // Verhindert Standard-Drag für das Bild
+                      e.stopPropagation();
+                      e.dataTransfer.setData("text/plain", shipSize);
+                      const parentDiv = e.currentTarget.parentElement;
+                      if (parentDiv instanceof HTMLDivElement) {
+                        setDraggedItem(parentDiv);
+                      }
+                    }}
+                    onContextMenu={(e) => e.preventDefault()}
+                    style={{ userSelect: "none", WebkitUserSelect: "none" }}
+                  /> */}
                 </div>
               )}
             </div>
@@ -973,5 +1117,6 @@ export default function TeamGamePrototype() {
         })}
       </div>
     </Container>
+    </>
   );
 }

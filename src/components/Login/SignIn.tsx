@@ -17,6 +17,7 @@ import { postLogin } from "../../backendAPI/loginAPI";
 import { getUser } from "../../backendAPI/userAPI";
 import { useNavigate } from "react-router-dom";
 import { generateRoomId } from "../../Resources";
+
 const server = process.env.REACT_APP_API_SERVER;
 const SignIn = () => {
   const dispatch = useDispatch();
@@ -116,8 +117,8 @@ const SignIn = () => {
             </Button>
           </div>
           <Alert variant="primary" className="text-center mt-3">
-          Want to create an account? Sign up {"\n"}
-          <Alert.Link onClick={() => navigate("/registration")}>Sign in</Alert.Link>
+          Want to create an account? {"\n"}
+          <Alert.Link onClick={() => navigate("/registration")}>Sign up</Alert.Link>
         </Alert>
         </Form>
       </Container>
