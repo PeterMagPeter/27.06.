@@ -703,7 +703,6 @@ export default function TeamGamePrototype() {
     if (partner) {
       newSkin = "standard";
     }
-    // weird commi für basti
     smallShip = getSkinImage(newSkin, "2");
     mediumShip = getSkinImage(newSkin, "3");
     largeShip = getSkinImage(newSkin, "4");
