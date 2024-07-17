@@ -3,25 +3,23 @@ import Header from "../Header/Header";
 import styles from "./PageOnline.module.css";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { setHostName, setRoomId } from "../reducer/LobbyReducer";
-import { generateRoomId } from "../../Resources";
+import { setHostName } from "../reducer/LobbyReducer";
 export default function PageOnline() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   let username = useSelector((state: any) => state.userReducer.username);
-  function hostLobby() {
-    let newRoomid = generateRoomId();
-    console.log(newRoomid);
-    dispatch(setHostName({ hostName: username }));
-    dispatch(setRoomId({ roomId: newRoomid }));
-    navigate("/onlineGameSettings");
+  function hostLobby (){
+    dispatch(setHostName({hostName: username}))
+    navigate("/onlineGameSettings")
   }
-
   return (
     <>
       <Header />
       <div className={styles.onlinePage}>
-        <button className={styles.onlineButton} onClick={() => hostLobby()}>
+        <button
+          className={styles.onlineButton}
+          onClick={() => hostLobby()}
+        >
           Host Game
         </button>
         <button

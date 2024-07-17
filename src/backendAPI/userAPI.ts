@@ -1,4 +1,4 @@
-import { RegisterResource, UserResource } from "../Resources";
+import { UserResource } from "../Resources";
 
 export async function getAllUsers(): Promise<UserResource> {
   const url = `${process.env.REACT_APP_API_SERVER_URL}/api/user/all`;
@@ -14,7 +14,7 @@ export async function getUser(userId: string): Promise<UserResource> {
   return await response.json();
 }
 
-export async function postUser(user: RegisterResource): Promise<UserResource> {
+export async function postUser(user: UserResource): Promise<UserResource> {
   const url = `${process.env.REACT_APP_API_SERVER_URL}/api/user`;
   const request = {
     method: "POST",
@@ -29,7 +29,7 @@ export async function postUser(user: RegisterResource): Promise<UserResource> {
 }
 
 export async function putUser(user: UserResource): Promise<UserResource> {
-  const url = `${process.env.REACT_APP_API_SERVER_URL}/api/user/${user._id}`;
+  const url = `${process.env.REACT_APP_API_SERVER_URL}/api/user/${user.id}`;
   const request = {
     method: "PUT",
     headers: {

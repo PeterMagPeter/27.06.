@@ -45,9 +45,9 @@ const SignIn = () => {
   function handleGuest(): void {
     dispatch(
       setUser({
-        email: "guest",
+        email: email === ""? "guest" : email,
         loggedIn: true,
-        username: "guest",
+        username: email === ""? "guest" : email,
       })
     );
   }
@@ -106,7 +106,7 @@ const SignIn = () => {
               variant="secondary"
               className={styles.gastButton}
             >
-              test
+              Als Gast fortfahren
             </Button>
           </div>
           <div className="text-center mt-3">

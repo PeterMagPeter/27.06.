@@ -14,8 +14,7 @@ export function Loser() {
           <h1 className={styles.loser}>Loser</h1>
           <h2 className={styles.subs}>What did you expect?</h2>
           <h3 className={styles.subs}>Embarassing...</h3>
-          <br />
-          <button onClick={() => navigate("/")} className={styles.backButton}>Be gone</button>
+          <Button onClick={() => navigate("/")}>zurück zum Hauptmenü</Button>
         </div>
       </div>
     </>

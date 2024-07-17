@@ -12,52 +12,63 @@ import styles from "./GameSettings.module.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import {
-  deleteLobby,
-  setLobby,
-  setPrivateMatch,
-  setTeam,
-  setPlayersInTeam,
-} from "../reducer/LobbyReducer";
+import { deleteLobby, setLobby } from "../reducer/LobbyReducer";
 import socket from "../Websocket/socketInstance";
 import { hostSettings } from "../reducer/LobbyReducer";
+import { hostname } from "os";
+
 export default function GameSettings() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const isHost: boolean = true;
   let username = useSelector((state: any) => state.userReducer.username);
   let privateMatch = useSelector(
     (state: any) => state.lobbyReducer.privateMatch
   );
-  let roomId = useSelector((state: any) => state.lobbyReducer.roomId);
-  let team = useSelector((state: any) => state.lobbyReducer.team);
+  let reducerRoomId = useSelector((state: any) => state.lobbyReducer.roomId);
   let reducerHostName = useSelector(
     (state: any) => state.lobbyReducer.hostName
   );
   const [hostName, setHostname] = useState<string>(username);
+  let roomId = useRef<string | null>(generateRoomId());
   const [maxPlayers, setMaxPlayers] = useState<number>(2);
   const [privateGame, setPrivate] = useState<boolean>(false);
   const [gameMap, setGameMap] = useState<string>("normal");
   const [gameMode, setGameMode] = useState<string>("1vs1");
   const [players, setPlayers] = useState<string[]>([hostName]);
-  const [playersTeam, setPlayersTeam] = useState<Map<string, number>>(
-    new Map([[reducerHostName, team]])
-  );
-
   const [superWeapons, setSuperWeapons] = useState<boolean>(true);
   const [shotTimer, setShotTimer] = useState<number>(10);
   const [createdRoom, setCreatedRoom] = useState<boolean>(false);
 
-  //Web Socket -> send gameSettings to backend
+  // const gameSettings = {
+  //   roomId,
+  //   players,
+  //   username,
+  //   maxPlayers,
+  //   private: privateGame,
+  //   shotTimer,
+  // };
+
   useEffect(() => {
     if (username !== reducerHostName)
-      socket.emit("sendJoinRoom", roomId, username);
+      socket.emit("sendJoinRoom", reducerRoomId, username);
 
     return () => {};
   }, []);
 
+  //Web Socket -> send gameSettings to backend
+
+  // Generate unique room id
+  function generateRoomId(): string {
+    const currentTime = Date.now();
+    const randomNumber = Math.floor(Math.random() * 9000) + 1000;
+    const roomId2 = currentTime + randomNumber;
+    return JSON.stringify(roomId2);
+  }
+
   function handleSaveSettings(): void {
     let body: hostSettings = {
-      roomId: roomId,
+      roomId: roomId.current,
       privateMatch: privateGame,
       maxPlayers: maxPlayers,
       gameMap: gameMap,
@@ -68,7 +79,12 @@ export default function GameSettings() {
       superWeapons: superWeapons,
       shotTimer: shotTimer,
     };
-    setEverything(body);
+    dispatch(
+      setLobby({
+        roomId: roomId.current,
+        privateMatch: privateGame,
+      })
+    );
     if (!createdRoom) socket.emit("sendHostLobby", body);
     else socket.emit("sendHostUpdatedLobby", body);
   }
@@ -79,31 +95,11 @@ export default function GameSettings() {
       setCreatedRoom(true);
       setHostname(username);
     });
-    socket.on("playerChangedTeam", (playerName: string, teamNumber: number) => {
-      changeTeam(playerName, teamNumber);
-    });
-    socket.on("playerJoinedRoom", (body: hostSettings, playerName: string) => {
+    socket.on("playerJoinedRoom", (body: hostSettings) => {
       console.log(JSON.stringify(body));
-      if (body && playerName) setEverything(body, playerName);
+      setEverything(body);
     });
-    // start with superweapons
-    socket.on("startMinePlacement", (playersInTeamObj: any) => {
-      console.log("startMinePlacement  obj", playersInTeamObj);
-
-      const playersInTeamMap = new Map(Object.entries(playersInTeamObj));
-      console.log("startMinePlacement map", playersInTeamMap);
-
-      dispatch(setPlayersInTeam({ playersInTeam: playersInTeamMap }));
-      navigate("/mineplacement");
-    });
-    // start without superweapons
-    socket.on("startShipPlacement", (playersInTeamObj: any) => {
-      console.log("startShipPlacement  obj", playersInTeamObj);
-
-      const playersInTeamMap = new Map(Object.entries(playersInTeamObj));
-      console.log("startShipPlacement map", playersInTeamMap);
-
-      dispatch(setPlayersInTeam({ playersInTeam: playersInTeamMap }));
+    socket.on("startShipPlacement", () => {
       navigate("/shipplacement");
     });
     socket.on("updatedLobby", (body: hostSettings) => {
@@ -115,59 +111,39 @@ export default function GameSettings() {
     return () => {};
   }, [socket]);
   // function to set everything lol
-  function setEverything(body: hostSettings, playerName?: string) {
-    const uniquePlayers = [...new Set(body.players)];
-    console.log(uniquePlayers);
-    setPlayers(uniquePlayers);
+  function setEverything(body: hostSettings) {
+    setPlayers(body.players);
     console.log(JSON.stringify(body));
     setHostname(body.hostName);
     setGameMap(body.gameMap);
     setGameMode(body.gameMode);
     setMaxPlayers(body.maxPlayers);
     // console.log(body.roomId, " roomid after joining")
-    // roomId = body.roomId;
+    // roomId.current = body.roomId;
     setSuperWeapons(body.superWeapons);
     setShotTimer(body.shotTimer);
     setPrivate(body.privateMatch);
-    if (playerName)
-      setPlayersTeam((prevPlayersTeam) => {
-        const updatedPlayersTeam: Map<string, number> = new Map<string, number>(
-          prevPlayersTeam
-        );
-        updatedPlayersTeam.set(playerName, -1);
-        console.log("setEverything", updatedPlayersTeam);
-        return updatedPlayersTeam;
-      });
-    console.log("setEverything playersTeam", playersTeam);
     dispatch(
       setLobby({
         roomId: body.roomId,
         privateMatch: privateGame,
-        gameMode: body.gameMode,
-        hostname: body.hostName,
-        maxPlayers: body.maxPlayers,
-        superWeapons: body.superWeapons,
       })
     );
   }
   function startGame(): void {
-    console.log("startGame", playersTeam);
-    const playersInTeamObj = Object.fromEntries(playersTeam);
-    if (superWeapons === true) {
-      socket.emit("sendStartMinePlacement", roomId, playersInTeamObj);
-    } else socket.emit("sendStartShipPlacement", roomId, playersInTeamObj);
+    socket.emit("sendStartShipPlacement", roomId.current);
   }
 
   function goBack(): void {
     // delete every state
-    socket.emit("sendLeaveRoom", roomId);
+    socket.emit("sendLeaveRoom", reducerRoomId);
     dispatch(deleteLobby());
     navigate("/online");
   }
 
   function kickPlayer(playerName: string): void {
     let body: hostSettings = {
-      roomId: roomId,
+      roomId: roomId.current,
       privateMatch: privateGame,
       maxPlayers: maxPlayers,
       gameMap: gameMap,
@@ -181,32 +157,12 @@ export default function GameSettings() {
     socket.emit("sendHostUpdatedLobby", body, playerName);
   }
 
-  function changeTeam(playerName: string, value: number): void {
-    console.log(value);
-    if (username === playerName) dispatch(setTeam({ team: value }));
-    setPlayersTeam((prevPlayersTeam) => {
-      const updatedPlayersTeam = new Map(prevPlayersTeam);
-      updatedPlayersTeam.set(playerName, value);
-      console.log("changeTeam", updatedPlayersTeam);
-      return updatedPlayersTeam;
-    });
-    console.log("changeTeam playersTeam", playersTeam);
-  }
-  const sendChangeTeam = (playerName: string, value: number) => {
-    socket.emit(
-      "sendPlayerChangedTeam",
-      roomId,
-      hostName !== username ? username : playerName,
-      value
-    );
-  };
-
   return (
     <>
       <Header />
       <div className={styles.pageSettings}>
         <Button onClick={() => goBack()}> back</Button>
-        <h1 className={styles.roomID}>Room-ID: {roomId?.toString()}</h1>
+        <h1 className={styles.roomID}>Room-ID: {roomId.current?.toString()}</h1>
         <Form className={styles.gameSettings}>
           <Row className={styles.firstFormItem}>
             <Col>
@@ -245,7 +201,8 @@ export default function GameSettings() {
                   onChange={(event) => {
                     setPrivate(event.target.checked);
                     dispatch(
-                      setPrivateMatch({
+                      setLobby({
+                        roomId: roomId.current,
                         privateMatch: event.target.checked,
                       })
                     );
@@ -328,34 +285,8 @@ export default function GameSettings() {
             <br />
             {players?.map((player) => (
               <Card key={player} bg="light" className={styles.playerCard}>
-                <div>
-                  {" "}
-                  <Card.Title>{player}</Card.Title>
-                  {gameMode === "Team" ? (
-                    <>
-                      {" "}
-                      <FormLabel>Team</FormLabel>
-                      <Form.Select
-                        className={styles.settingsInput}
-                        onChange={(event) =>
-                          sendChangeTeam(player, parseInt(event.target.value))
-                        }
-                        value={playersTeam.get(player)}
-                        disabled={
-                          !(player === username || hostName === username)
-                        }
-                      >
-                        {playersTeam.get(player) === -1 ? (
-                          <option>{playersTeam.get(player)}</option>
-                        ) : null}
-                        <option>1</option>
-                        <option>2</option>
-                        {/* <option>3</option> */}
-                      </Form.Select>
-                    </>
-                  ) : null}
-                </div>
-                {hostName === player ? null : hostName === username ? (
+                <Card.Title>{player}</Card.Title>
+                {hostName === player ? null : (
                   <Button
                     variant="danger"
                     size="sm"
@@ -365,7 +296,7 @@ export default function GameSettings() {
                   >
                     Kick{" "}
                   </Button>
-                ) : null}
+                )}
               </Card>
             ))}
           </div>
@@ -384,18 +315,14 @@ export default function GameSettings() {
             size="lg"
             onClick={() => startGame()}
             disabled={
-              players.length === maxPlayers && // unbedingt wieder zurück ändern!!!!!!!!! auf maxplayers
-              hostName === username &&
-              (Array.from(playersTeam.values()).every((team) => team !== -1)|| gameMode==="1vs1")
-                ? false
+              players?.length === maxPlayers
+                ? hostName === username
+                  ? false
+                  : true
                 : true
             }
           >
             Start Game
-          </Button>
-          <Button onClick={() => console.log("button", playersTeam)}>
-            {" "}
-            print map
           </Button>
         </div>
       </div>

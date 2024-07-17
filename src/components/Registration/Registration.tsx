@@ -39,7 +39,7 @@ export default function Registration() {
       username: username,
     });
 
-    navigate("/verification")
+    navigate("/")
     
     console.log(newUser)
     // wenn passwort und email übereinstimmen soll der user angelegt werden
@@ -47,8 +47,8 @@ export default function Registration() {
   };
   return (
     <Container className={styles.container}>
-      <Container className={styles.LogoContainer}>
-        <Image src={Logo} className={styles.Logo} />
+      <Container className={styles.Logo}>
+        <Image src={Logo} />
       </Container>
       <Form className={styles.RegistrationForm}>
         <Form.Group className="mb-3">

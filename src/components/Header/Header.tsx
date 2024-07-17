@@ -43,20 +43,15 @@ export default function Header() {
   };
 
   function handleHome(): void {
-    socket.emit("sendLeaveRoom", roomId);
-    dispatch(deleteLobby());
-    navigate("/");
+    socket.emit("sendLeaveRoom", roomId)
+    dispatch(deleteLobby())
+    navigate("/")
   }
 
-  function handleLogin(): void {
-    dispatch(deleteUser());
-    navigate("/");
-  }
-  let pathname = window.location.pathname;
   return (
     <Navbar className="bg-body-tertiary" data-bs-theme="dark">
       <div className={styles.headerStack}>
-        <div className={styles.logo}>
+        <div>
           <Image
             onClick={() => handleHome()}
             className={styles.homeImg}
@@ -64,63 +59,62 @@ export default function Header() {
             width={"250px"}
           />
         </div>
-
-        <div className={styles.backText} onClick={handleHome}>
-          <a> Go Back</a>
-        </div>
-
-        <div className={styles.profileContainer}>
-          {!guest && (
-            <div className={styles.imageContainer}>
-              <Image
-                onClick={() => navigate("/profile")}
-                className={styles.profileImg}
-                src={Pic}
-              />
-            </div>
-          )}
-          <div className={styles.headerDropdown}>
-            <Nav>
-              <NavDropdown title={loggedIn ? nick : "Menu"} align={"end"}>
-                {!guest && (
-                  <NavDropdown.Item onClick={() => navigate("/profile")}>
-                    Profile settings
-                  </NavDropdown.Item>
-                )}
-                {soundOn ? (
-                  <NavDropdown.Item onClick={() => setSoundOn(false)}>
-                    Sound off
-                  </NavDropdown.Item>
-                ) : (
-                  <NavDropdown.Item onClick={() => setSoundOn(true)}>
-                    Sound on
-                  </NavDropdown.Item>
-                )}
-                {musicOn ? (
-                  <NavDropdown.Item onClick={() => setMusicOn(false)}>
-                    Music off
-                  </NavDropdown.Item>
-                ) : (
-                  <NavDropdown.Item onClick={() => setMusicOn(true)}>
-                    Music on
-                  </NavDropdown.Item>
-                )}
-                <NavDropdown.Divider />
-                {guest ? (
-                  <NavDropdown.Item onClick={() => handleLogin()}>
-                    Login
-                  </NavDropdown.Item>
-                ) : (
-                  <NavDropdown.Item
-                    onClick={handleLogout}
-                    style={{ backgroundColor: "darkred" }}
-                  >
-                    Logout
-                  </NavDropdown.Item>
-                )}
-              </NavDropdown>
-            </Nav>
-          </div>
+        <div className={styles.msAuto}>
+          <Row>
+            {!guest && (
+              <Col>
+                <Image
+                  onClick={() => navigate("/profile")}
+                  className={styles.profileImg}
+                  src={Pic}
+                  width={"40px"}
+                />
+              </Col>
+            )}
+            <Col>
+              <Nav>
+                <NavDropdown
+                  className={styles.headerDropdown}
+                  title={loggedIn ? nick : "Menu"}
+                  align={"end"}
+                >
+                  {!guest && (
+                    <NavDropdown.Item onClick={() => navigate("/profile")}>
+                      Profile settings
+                    </NavDropdown.Item>
+                  )}
+                  {soundOn ? (
+                    <NavDropdown.Item onClick={() => setSoundOn(false)}>
+                      Sound off
+                    </NavDropdown.Item>
+                  ) : (
+                    <NavDropdown.Item onClick={() => setSoundOn(true)}>
+                      Sound on
+                    </NavDropdown.Item>
+                  )}
+                  {musicOn ? (
+                    <NavDropdown.Item onClick={() => setMusicOn(false)}>
+                      Music off
+                    </NavDropdown.Item>
+                  ) : (
+                    <NavDropdown.Item onClick={() => setMusicOn(true)}>
+                      Music on
+                    </NavDropdown.Item>
+                  )}
+                  <NavDropdown.Divider />
+                  {guest ? (
+                    <NavDropdown.Item onClick={() => navigate("/")}>
+                      Login
+                    </NavDropdown.Item>
+                  ) : (
+                    <NavDropdown.Item onClick={handleLogout}>
+                      Logout
+                    </NavDropdown.Item>
+                  )}
+                </NavDropdown>
+              </Nav>
+            </Col>
+          </Row>
         </div>
       </div>
     </Navbar>
