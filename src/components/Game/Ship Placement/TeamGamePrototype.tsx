@@ -92,7 +92,7 @@ export default function TeamGamePrototype() {
   let largeShip = getSkinImage(skin, "4");
   let xlargeShip = getSkinImage(skin, "5");
   let smallShipR = getSkinImage(skin, "2r");
-  let mediumShipR = getSkinImage(skin, "3r"); 
+  let mediumShipR = getSkinImage(skin, "3r");
   let largeShipR = getSkinImage(skin, "4r");
   let xlargeShipR = getSkinImage(skin, "5r");
   console.log("skin: ", skin, mediumShip);
@@ -223,8 +223,9 @@ export default function TeamGamePrototype() {
     };
     newShip = findNonOverlappingPosition(newShip);
     // Fügen Sie das Schiff zum items-Array hinzu
-    setItems([...items, newShip]);
-    if (gameMode === "Team") sendShipsToPartner([...items, newShip]);
+    let newShips = [...items, newShip]
+    setItems(newShips);
+    if (gameMode === "Team") sendShipsToPartner(newShips);
     setDelItems([]);
   };
   const rotateRemove = (id: string) => {
@@ -315,7 +316,8 @@ export default function TeamGamePrototype() {
       newItem = findNonOverlappingPosition(newItem);
 
       setItems([...items, newItem]);
-      if (gameMode === "Team") sendShipsToPartner([...items, newItem]);
+      let newItemsToSend = [...items, newItem];
+      if (gameMode === "Team") sendShipsToPartner(newItemsToSend);
     }
   };
 
@@ -533,7 +535,7 @@ export default function TeamGamePrototype() {
     if (uniqueLayout.length !== layout.length) {
       setLayout(uniqueLayout);
     }
-  }, [layout]);
+  }, [layout, partnerShips, items]);
 
   const placeShipsRandomly = () => {
     let test: any = items.forEach((item) => rotateRemove(item.i));
@@ -644,11 +646,13 @@ export default function TeamGamePrototype() {
     difficulty.current = newDifficulty;
   };
   function translateToLayout(item: ShipTemplate): Layout {
+    console.log("translateToLayout item ", item);
     let newW = item.direction === "X" ? item.length : 1;
     let newH = item.direction === "X" ? 1 : item.length;
     const breakpoint = /.{1,1}/g;
 
     const splitted = item.identifier.match(breakpoint)!;
+    console.log("translateToLayout splitted ", splitted);
 
     let newId = `shipPartner-${splitted[0]}`;
     if (splitted[1]) newId += "-" + splitted[1];
@@ -661,42 +665,29 @@ export default function TeamGamePrototype() {
       h: newH,
       isDraggable: false,
     };
-
+    console.log("translateToLayout newitem ", newItem);
     return newItem;
   }
   function updatePartnerShips(ships: ShipTemplate[]) {
     const translatedPartnerShips = ships.map((item) => translateToLayout(item));
-    // onDrop
-    // wenn neues schiff dann hinzufügen
+    
+    // Wenn neue Schiffe hinzugefügt wurden
     if (ships.length > partnerShips.length) {
-      setPartnerShips([...translatedPartnerShips]);
+      setPartnerShips(translatedPartnerShips);
+      setLayout((prevLayout) => [...prevLayout, ...translatedPartnerShips]);
       return;
     }
-    // onDragStop
-    // wenn updated
-    let updatedLayout: Layout[] = layout;
-    let updatedItems: Layout[] = partnerShips;
-    translatedPartnerShips.map((newItem: Layout) => {
-      updatedLayout = layout.map((item: Layout) => {
-        if (item.i === newItem.i) {
-          // const newPosition = findNonOverlappingPosition(newItem, layout);
-          return { ...item, ...newItem };
-        }
-        return item;
-      });
-
-      updatedItems = partnerShips.map((item) => {
-        if (item.i === newItem.i) {
-          // const newPosition = findNonOverlappingPosition(newItem, partnerShips);
-          return { ...item, ...newItem };
-        }
-        return item;
+    
+    // Für Updates (onDragStop)
+    setPartnerShips(translatedPartnerShips);
+    setLayout((prevLayout) => {
+      return prevLayout.map((item) => {
+        const updatedShip = translatedPartnerShips.find((ship) => ship.i === item.i);
+        return updatedShip ? { ...item, ...updatedShip } : item;
       });
     });
-    setLayout(updatedLayout);
-
-    setPartnerShips(updatedItems);
   }
+  
   // i: `ship-${newId}-${letter}`, for layout identifier "ship-2-a"
   function whatShip(item: Layout, partner: boolean) {
     let newSkin = skin;
@@ -712,7 +703,7 @@ export default function TeamGamePrototype() {
     largeShipR = getSkinImage(newSkin, "4r");
     xlargeShipR = getSkinImage(newSkin, "5r");
     let s: string[] = item.i.split("-");
-    console.log("wahtship ", item, s)
+    console.log("wahtship ", item, s);
     let newPic = mediumShip;
     if (item.w > item.h) {
       switch (s[1]) {
@@ -751,11 +742,9 @@ export default function TeamGamePrototype() {
     }
     return newPic;
   }
-useEffect(() => {
-
-  return () => {
-  }
-}, [partnerShips])
+  useEffect(() => {
+    return () => {};
+  }, [partnerShips]);
 
   const handleDragStart = () => {
     setDragging(true);
@@ -878,10 +867,16 @@ useEffect(() => {
   return (
     <>
       <Container className={styles.container} ref={containerRef}>
-        <Button onClick={() => console.log(items, partnerShips)}>
+        {/* <Button
+          onClick={() => {
+            console.log(items);
+            console.log(partnerShips);
+            console.log(layout);
+          }}
+        >
           {" "}
           print items
-        </Button>
+        </Button> */}
         {/* <div className={styles.Header}><Header></Header></div> */}
         <div className={styles.LogoDiv} onClick={() => goBack()}>
           <div className={styles.backText}>Go Back</div>
@@ -979,7 +974,11 @@ useEffect(() => {
             {partnerShips.map((item) => {
               let newPic = whatShip(item, true);
               return (
-                <div key={item.i} className={styles.ship} draggable={false}>
+                <div
+                  key={item.i}
+                  className={item.w > item.h ? styles.ship : styles.rotatedShip}
+                  draggable={false}
+                >
                   <Image
                     draggable={false}
                     src={newPic}
@@ -987,6 +986,7 @@ useEffect(() => {
                       item.w > item.h ? styles.normalPic : styles.rotatedPic
                     }
                   />
+                  
                 </div>
               );
             })}
@@ -1043,20 +1043,20 @@ useEffect(() => {
         </Button> */}
           {/* Schiffs anzeige anhand des Größentags  */}
           {Object.keys(shipIds.current).map((key) => {
-             let newSkin = skin;
-             smallShip = getSkinImage(newSkin, "2");
-             mediumShip = getSkinImage(newSkin, "3");
-             largeShip = getSkinImage(newSkin, "4");
-             xlargeShip = getSkinImage(newSkin, "5");
-             smallShipR = getSkinImage(newSkin, "2r");
-             mediumShipR = getSkinImage(newSkin, "3r");
-             largeShipR = getSkinImage(newSkin, "4r");
-             xlargeShipR = getSkinImage(newSkin, "5r");
+            let newSkin = skin;
+            smallShip = getSkinImage(newSkin, "2");
+            mediumShip = getSkinImage(newSkin, "3");
+            largeShip = getSkinImage(newSkin, "4");
+            xlargeShip = getSkinImage(newSkin, "5");
+            smallShipR = getSkinImage(newSkin, "2r");
+            mediumShipR = getSkinImage(newSkin, "3r");
+            largeShipR = getSkinImage(newSkin, "4r");
+            xlargeShipR = getSkinImage(newSkin, "5r");
             let maxVal = maxS;
             let shipSize = smallShipSize;
             let newClass: string = styles.s;
             let newPic = mediumShip;
-            console.log("auswahl 1",newPic)
+            // console.log("auswahl 1", newPic);
 
             if (key === "s") {
               newPic = smallShip;
@@ -1076,7 +1076,7 @@ useEffect(() => {
               newPic = xlargeShip;
               newClass = styles.xl;
             }
-            console.log("auswahl ",newPic)
+            console.log("auswahl ", newPic);
             // Erstelle ein div-Element für jeden Schlüssel
             return (
               <div key={key} className={newClass}>

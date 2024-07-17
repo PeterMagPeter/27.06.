@@ -284,7 +284,7 @@ export default function TeamGameField() {
         socket.emit("sendLeaveRoom", roomId, privateMatch);
         dispatch(deleteLobby());
         // bekommt gewinner namen
-        if (body.username === username) {
+        if (body.username === username || body.username === teamName) {
           playSFXSound(victory);
 
           navigate("/win");
@@ -590,6 +590,13 @@ export default function TeamGameField() {
       if (oldButton) {
         if (!hasAlreadyState(oldButton)) changeColor(oldButton, "Normal");
       }
+    }
+    let newMap = new Map(shotsSelected);
+    for (let [user, pos] of newMap) {
+      if (pos.x === position.x && pos.y === position.y){
+        setOwnSelectedPosition(undefined)
+        console.log("ownButton", ownSelectedPosition)
+        return};
     }
     if (button) {
       if (!hasAlreadyState(button)) {
@@ -923,14 +930,14 @@ export default function TeamGameField() {
             </div>
           </div>
         )}
-        <div className={styles.EmoteContainer}>
+        {/* <div className={styles.EmoteContainer}>
           <div className={styles.Emotes}>
             <Button className={styles.EmoteButton} variant="secondary">
               {" "}
               Emotes
             </Button>
           </div>
-        </div>
+        </div> */}
         {gameMode === "Team" && whichTurn ? (
           <div className={styles.ShootContainer}>
             <div className={styles.Shoot}>
@@ -938,7 +945,7 @@ export default function TeamGameField() {
                 className={styles.ShootButton}
                 variant="primary"
                 onClick={() => (ownSelectedPosition ? shotIsReady() : null)}
-                disabled={shotReady}
+                disabled={shotReady || !ownSelectedPosition}
               >
                 Shoot {playersReady} / {maxPlayers / 2}
               </Button>

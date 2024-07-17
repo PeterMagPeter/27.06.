@@ -393,10 +393,10 @@ export default function GameSettings() {
           >
             Start Game
           </Button>
-          <Button onClick={() => console.log("button", playersTeam)}>
+          {/* <Button onClick={() => console.log("button", playersTeam)}>
             {" "}
             print map
-          </Button>
+          </Button> */}
         </div>
       </div>
     </>

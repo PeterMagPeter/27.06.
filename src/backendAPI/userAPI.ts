@@ -14,7 +14,7 @@ export async function getUser(userId: string): Promise<UserResource> {
   return await response.json();
 }
 
-export async function postUser(user: RegisterResource): Promise<UserResource> {
+export async function postUser(user: RegisterResource): Promise<RegisterResource> {
   const url = `${process.env.REACT_APP_API_SERVER_URL}/api/user`;
   const request = {
     method: "POST",

@@ -2,10 +2,10 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import styles from "./Registration.module.css";
 import { useNavigate } from "react-router-dom";
-import { Form, Button, Container, Alert, Image } from "react-bootstrap";
+import { Form, Button, Container, Alert, Image, Toast, ToastBody, ToastContainer, ToastHeader } from "react-bootstrap";
 import Logo from "../../assets/pictures/cof_logo.png";
-import { postUser } from "../../backendAPI/userAPI";
-import { UserResource } from "../../Resources";
+import { getUser, postUser } from "../../backendAPI/userAPI";
+import { RegisterResource } from "../../Resources";
 import { setUser } from "../reducer/TestReducer";
 
 export default function Registration() {
@@ -18,7 +18,8 @@ export default function Registration() {
   const [emailConfirmed, setEmailConfirmed] = useState(false);
   const [passwordConfirmed, setPasswordConfirmed] = useState(false);
   const [username, setUsername] = useState("");
-  let newUser: UserResource | null;
+  const [showToast, setShowToast] = useState(false);
+  let newUser: RegisterResource | null;
 
   const handleRegisterButton = async (e: any) => {
     e.preventDefault();
@@ -32,21 +33,31 @@ export default function Registration() {
       setPasswordConfirmed(true);
       //return;
     } else setPasswordConfirmed(true);
-    console.log(process.env.REACT_APP_API_SERVER_URL)
+    console.log(process.env.REACT_APP_API_SERVER_URL);
     newUser = await postUser({
       email: email,
       password: password,
       username: username,
     });
 
-    navigate("/verification")
-    
-    console.log(newUser)
+    if (newUser.username) {
+      setShowToast(false);
+      navigate("/verification");
+    } else {
+      setShowToast(true);
+    }
+
     // wenn passwort und email übereinstimmen soll der user angelegt werden
     // nachdem überprüft wurde ob der username schon existiert oder nicht
   };
   return (
     <Container className={styles.container}>
+      <ToastContainer position="top-center">
+        <Toast bg="danger" show={showToast} onClose={() => setShowToast(false)}>
+          <ToastHeader>Error</ToastHeader>
+          <ToastBody>Registration failed. Please try again later.</ToastBody>
+        </Toast>
+      </ToastContainer>
       <Container className={styles.LogoContainer}>
         <Image src={Logo} className={styles.Logo} />
       </Container>
