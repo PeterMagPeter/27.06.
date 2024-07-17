@@ -12,11 +12,9 @@ export function Winner() {
           <img src={firework}></img>
         </div>
         <div className={styles.texts}>
-          <h1>You won!</h1>
-          <h2>And defeated the AI God himself...</h2>
-          <h3>Congratulations, Master!</h3>
-          <Button onClick={() => navigate("/")}>zurück zum Hauptmenü</Button>
-
+          <h1 className={styles.winText}>You won!</h1>
+          <h3 className={styles.congrats}>Congratulations, Commander!</h3>
+          <button onClick={() => navigate("/")} className={styles.backButton}>Main menu</button>
         </div>
       </div>
     </>

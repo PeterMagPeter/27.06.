@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { UserResource } from "../../Resources";
 export interface ShipTemplate {
   identifier: string;
   direction: "X" | "Y";
@@ -6,23 +7,40 @@ export interface ShipTemplate {
   startY: number;
   length: number;
 }
+type Position = { x: number; y: number };
+export interface Ship {
+  isHorizontal: boolean;
+  startPosition: Position;
+  length: number;
+  initialPositions: Position[];
+  hitPositions: Position[];
+
+  imSunk: boolean;
+  identifier: string;
+}
 interface User {
   token: string;
+  user: UserResource | null
   loggedIn: boolean;
   username: string;
-  email: string
+  email: string;
   ships: ShipTemplate[];
   guest: boolean;
+  skin: string;
+  points: number;
 }
 
 // Initialer Zustand des Reducers
 const initialState: User = {
   token: "",
+  user: null,
   loggedIn: false,
   username: "",
   email: "",
   ships: [],
-  guest: true
+  guest: true,
+  skin: "standard",
+  points: 0
 };
 
 // Erstelle ein Slice mit einem Reducer und Aktionen
@@ -34,7 +52,8 @@ const userReducer = createSlice({
       state.token = "";
       state.username = "";
       state.loggedIn = false;
-      state.email="";
+      state.email = "";
+      state.user = null
       console.log("user gelöscht: ");
     },
     setUser: (state, action) => {
@@ -43,17 +62,22 @@ const userReducer = createSlice({
       state.username = action.payload.username;
       state.email = action.payload.email;
       state.guest = action.payload.guest;
-
-      console.log("in setUser für " + JSON.stringify(state.username));
-      console.log(" - token:  " + JSON.stringify(state.token));
-      console.log(" - loggedIn:  " + JSON.stringify(state.loggedIn));
+    },
+    setUserObject: (state, action)=>{
+      state.user = action.payload.user
     },
     setShips: (state, action) => {
-      state.ships = action.payload.ships
+      state.ships = action.payload.ships;
+    },
+    setSkin: (state, action) => {
+      state.skin = action.payload.skin;
+    },
+    setPoints: (state, action) => {
+      state.points = action.payload.points;
     }
   },
 });
 
 // Exportiere Reducer und Aktionen
-export const { deleteUser, setUser, setShips,  } = userReducer.actions;
+export const { deleteUser, setUser, setShips, setSkin,setUserObject } = userReducer.actions;
 export default userReducer.reducer;

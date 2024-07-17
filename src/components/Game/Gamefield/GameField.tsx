@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import logoPic from "../../../assets/pictures/cof_logo.png";
 import { ShipTemplate } from "../../reducer/TestReducer";
-import { setLobby } from "../../reducer/LobbyReducer";
+import { deleteLobby, setLobby } from "../../reducer/LobbyReducer";
 import socket from "../../Websocket/socketInstance";
 import { Howl } from "howler";
 import { setSettings } from "../../reducer/SettingsReducer";
@@ -110,11 +110,7 @@ export default function GameField() {
       socket.on("gameOver", (body: any) => {
         socket.emit("sendLeaveRoom", roomId, privateMatch);
         dispatch(
-          setLobby({
-            initPlayer: "",
-            roomId: "",
-            privateMatch: false
-          })
+          deleteLobby()
         );
         // bekommt gewinner namen
         if (body.username === username) {

@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import logoPic from "../../../assets/pictures/cof_logo.png";
 import { ShipTemplate } from "../../reducer/TestReducer";
-import { setLobby } from "../../reducer/LobbyReducer";
+import { setLobby, setRoomId } from "../../reducer/LobbyReducer";
 import useWebSocket from "../../Websocket/useWebSocket";
 import socket from "../../Websocket/socketInstance";
 import smallShip from "../../../assets/pictures/Schiffe/StandardPNG/holes/2.png";
@@ -39,7 +39,7 @@ export default function LobbyTest() {
     socket.emit("sendJoinRoom", newRoomId.current, username);
     console.log("join", newRoomId.current)
     dispatch(
-      setLobby({
+      setRoomId({
         roomId: newRoomId.current,
       })
     );

@@ -23,3 +23,23 @@
     color: white;
     text-align: center;
 }
+
+.winText{
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 2vh;
+    margin-top: 2vh;
+}
+
+.congrats{
+    margin-bottom: 2vh;
+}
+
+
+.backButton {
+    background-color: rgb(187, 187, 187);
+    border: none;
+    border-radius: 5px;
+    height: 40px;
+    width: 120px;
+}
