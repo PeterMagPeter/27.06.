@@ -1,0 +1,95 @@
+.body {
+  overflow: hidden !important;
+}
+.container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: 1fr;
+  gap: 0px 0px;
+  grid-auto-flow: row;
+  grid-template-areas: "imageContainer signIn";
+  min-width: 100vw !important;
+  min-height: 100vh !important;
+  overflow: hidden !important;
+  padding-left: 0% !important;
+}
+
+.imageContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 100%;
+  align-items: center;
+  grid-area: imageContainer;
+  background-color: rgb(47, 75, 88);
+}
+
+.signIn {
+  display: flex;
+  grid-area: signIn;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 100%;
+  min-height: 100vh;
+  overflow-y: auto !important;
+}
+.gastButton {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+  margin-bottom: 2%;
+}
+
+.buttonFb{
+  border: rgb(0, 110, 255) solid 1px;
+  border-radius: 7px;
+  background-color: rgba(245, 222, 179, 0);
+  margin-right: 10px;
+  color:  rgb(0, 110, 255);
+  min-height: 40px;
+}
+
+.badge{
+  transform: rotate(-10deg);
+  margin-right: 10px;
+}
+
+
+@media screen and (max-width: 900px) { 
+  
+  .container {
+    grid-template-columns: 1fr; 
+    grid-template-rows: auto;
+    grid-template-areas:
+      "imageContainer"
+      "signIn";
+    background-color: rgb(47, 75, 88);
+  }
+
+  .imageContainer {
+    justify-self: center;
+    align-self: center;
+  }
+  .image {
+    max-width: 100%;
+    object-fit: scale-down;
+  }
+  .signIn {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: stretch;
+    min-width: 100%;
+    min-height: 100vh;
+    margin-top: 15%;
+    overflow-y: auto !important;
+  }
+
+
+.buttonFb{
+  border: rgb(255, 255, 255) solid 1px;
+  background-color: rgba(105, 175, 255, 0);
+  color:  rgb(255, 255, 255);
+}
+}
